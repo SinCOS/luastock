@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{title}}</title>
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="/public/layui/css/layui.css" media="all">
+    <script src="//code.jquery.com/jquery.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/bs-3.3.5/jq-2.1.4,dt-1.10.8/datatables.min.css">
+    
+</head>
+
+<style type="text/css">
+.layui-nav {
+    margin-left: 0px;
+}
+
+.header {
+    height: 60px;
+    border-bottom: none;
+}
+
+.layui-nav-right {
+    position: absolute;
+    right: 0px;
+    top: 0;
+}
+
+.tb_body {
+    padding: 15px;
+}
+</style>
+
+<body>
+    <div class="layui-layout layui-layout-admin" id='app'>
+        {(view/menu.html)}
+        <div class="layui-body tb_body" style="overflow-y:scroll;">
+            <table id="table_one" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th rowspan="2" colspan="3">说明:委托20万以上，成交的金额算做主力流入流出资金</th>
+                        <th colspan="2">实时累计（万元）</th>
+                        <th colspan="3">1分钟</th>
+                        <th>3分钟</th>
+                        <th> </th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th colspan="2">15：00-9：30</th>
+                        <th v-text="time.last_one"></th>
+                        <th v-text="time.last_two"></th>
+                        <th v-text="time.last_three"></th>
+                        <th>9：32-9：30</th>
+                        <th> </th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th style="width: 20px;">排名</th>
+                        <th style="width: 100px;">股票代码</th>
+                        <th style="width: 100px;">股票名称</th>
+                        <th style="width: 130px;" id="tab1">流入占比</th>
+                        <th style="width: 130px;" id="tab2">总净流入</th>
+                        <th style="width: 130px;" id="tab3">净流入</th>
+                        <th style="width: 130px;">净流入</th>
+                        <th style="width: 130px;">净流入</th>
+                        <th style="width: 130px;" id="tab4">净流入</th>
+                        <th style="width: 60px;">涨幅</th>
+                        <th style="width: 60px;">涨速</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    
+        <div class="layui-footer">
+                copyright @ ssin 
+        </div>
+          {(view/public_div.html)}
+    </div>
+    
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/vue.resource/1.2.1/vue-resource.min.js"></script>
+<script src="/public/layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js"></script>
+<script type="text/javascript">
+var stock_url = '/api/stock/jlr';
+var table_info = {
+    stock_url: stock_url,
+    columns: [{
+        "data": null,
+        'orderable': false
+    }, {
+        "data": "cpy_id"
+    }, {
+        "data": "name"
+    }, {
+        "data": "zlbfb"
+    }, {
+        "data": "jlr"
+    }, {
+        "data": "calc"
+    }, {
+        "data": "one"
+    }, {
+        "data": "two"
+    }, {
+        "data": "three"
+    }, {
+        "data": "zf"
+    }, {
+        "data": "zs"
+    }, {
+        "data": null,
+        'orderable': false
+    }],
+    current: null
+};
+console.log(table_info.stock_url);
+</script>
+<script type="text/javascript" src="/public/js/common.js?v2.10"></script>
+<script type="text/javascript" src="/public/js/table.js?v1"></script>
+<style type="text/css">
+td.error {
+    background-color: #f04124;
+    border-color: #de2d0f;
+    color: #fff;
+}
+
+td.success {
+    background-color: #43AC6A;
+    border-color: #3a945b;
+    color: #fff;
+}
+</style>
+
+</html>

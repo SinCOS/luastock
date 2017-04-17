@@ -1,0 +1,62 @@
+   <div class="layui-header header">
+            <div class="layui-main" style="margin: 0px;">
+                <ul class="layui-nav ">
+                    <li class="layui-nav-item"><a href="javascript:void;">主力追踪</a></li>
+                    <li class="layui-nav-item layui-this">
+                        <a href="javascript:;">数据中心</a>
+                        <dl class="layui-nav-child">
+                            {% for _,v in ipairs(url.list) do %}
+                            <dd><a href="{{v.url}}">{{v.key}}</a></dd>
+                            {% end %}
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item"><a href="/news" _target="_blank">新闻中心</a></li>
+                    <li class="layui-nav-item"><a href="/echarts" _target="_blank">大盘走势图</a></li>
+                    <li class="layui-nav-item"><a href="">社区</a></li>
+                </ul>
+                <ul class="layui-nav layui-nav-right">
+                    <template v-if="loginIn ==  true">
+                        <li class="layui-nav-item">
+                            <a href="javascript:;" v-text="userInfo['username']"></a>
+                            <dl class="layui-nav-child">
+                                <dd><a href="">移动模块</a></dd>
+                                <dd><a href="javascript:shutdown();">退出</a></dd>
+                            </dl>
+                        </li>
+                    </template>
+                    <template v-else>
+                        <li class="layui-nav-item"><a href="javascript:login();">登录</a></li>
+                        <li class="layui-nav-item"><a href="javascript:register();">注册</a></li>
+                    </template>
+                </ul>
+            </div>
+        </div>
+        <div class="layui-side layui-bg-black">
+            <div class="layui-side-scroll">
+                <ul class="layui-nav layui-nav-tree" lay-filter="demo">
+                    <li class="layui-nav-item layui-nav-itemed">
+                        <a href="javascript:;">自选股</a>
+                        <dl class="layui-nav-child">
+                            <dd  class="layui-this"><a href="javascript:;" @click="favor_click(0,0)">默认</a></dd>
+                            <template v-for="item in userFavor">
+                            {-raw-}
+                                <dd>
+                                    <a href="javascript:;"  @click="favor_click(item.id,1)"> {{ item.name }}</a> 
+                                </dd>
+                            {-raw-}
+                            </template>
+                        </dl>
+                    </li>
+                  <!--   <li class="layui-nav-item">
+                        <a href="javascript:;">解决方案</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="">移动模块</a></dd>
+                            <dd><a href="">后台模版</a></dd>
+                            <dd><a href="">电商平台</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item"><a href="">云市场</a></li>
+                    <li class="layui-nav-item"><a href="">社区</a></li> -->
+                </ul>
+            </div>
+        </div>

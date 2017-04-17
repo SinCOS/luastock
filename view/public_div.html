@@ -1,0 +1,60 @@
+    <div class="layer" id='favor' style="display:none;">
+            <ul class="list-group" id='favorul' style="padding:10px;">
+                <template v-for="(item,index) in userFavor" >
+                     <li class="list-group-item" v-text='item.name' :class="{'active':favorIndex == item.id  }" @click="favor_select(item.id)"></li>
+                </template>
+            </ul>
+    </div>
+    <div class="login-from" id='login_frm' style="display: none;">
+        <form class="layui-form" style="padding: 20px;">
+            <div class="layui-form-item ">
+                <label class="layui-form-label ">用户名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="username" required lay-verify="required " placeholder="请输入用户名" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item ">
+                <label class="layui-form-label ">密 码</label>
+                <div class="layui-input-block">
+                    <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input ">
+                </div>
+                <div class="layui-form-mid layui-word-aux"><img src=""></div>
+            </div>
+            <div class="layui-form-item ">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                    <a href="/user/forget " title="忘记密码 ">忘记密码</a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="register_frm" id="register_frm" style="display: none;">
+        <form class="layui-form layui-form-pane"  style="padding: 20px 15px 20px 0px;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="username" required lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密 码</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off " class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux"><img src=""></div>
+            </div>
+            <div class="layui-form-item">
+                 <label class="layui-form-label">密码框</label>
+             <div class="layui-input-inline">
+      <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                    <a href="/user/forget" title="已有帐号">已有帐号</a>
+                </div>
+            </div>
+        </form>
+    </div>

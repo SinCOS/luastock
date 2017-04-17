@@ -1,0 +1,19 @@
+{
+    "remotePath": "./",
+    "host": "120.24.184.121",
+    "username": "luaapp",
+    "password": "123456",
+    "port": 21,
+    "secure": false,
+    "protocol": "ftp",
+    "uploadOnSave": true,
+    "passive": false,
+    "debug": false,
+    "privateKeyPath": null,
+    "passphrase": null,
+    "ignore": [
+        "\\.vscode",
+        "\\.git",
+        "\\.DS_Store"
+    ]
+}
