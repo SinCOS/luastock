@@ -191,7 +191,7 @@ r:match('POST','/user/category',function()
 
 end)
 
-r:match('GET','user/category',function()
+r:match('GET','/user/category',function()
     -- local args = ngx.get_post_args()
     -- if not args or nil == args['name'] then
     --     json_error("非法访问"，400)
@@ -225,7 +225,7 @@ local function update_stock_cache(sg_id)
       end
 
 end
-r:match('DELETE','user/favor/:sg_id/:cpy_id',function(params)
+r:match('DELETE','/user/favor/:sg_id/:cpy_id',function(params)
     local sg_id = tonumber(params.sg_id)
     local cpy_id = ndk.set_var.set_quote_sql_str(tostring(params.cpy_id))
     local uid = auth_check()
@@ -239,7 +239,7 @@ r:match('DELETE','user/favor/:sg_id/:cpy_id',function(params)
     json_suc("删除成功" ,200)
     update_stock_cache(sg_id)
 end);
-r:match('POST','user/favor/:cpy_id',function(params)
+r:match('POST','/user/favor/:cpy_id',function(params)
     local args = ngx_req.get_post_args()
     local sg_id = tonumber(args['sg_id'] or 0)
     local user_id = auth_check()
