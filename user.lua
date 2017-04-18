@@ -9,7 +9,8 @@ local stock_cache = ngx.shared.stock_cache
 local db = nil
 local len = string.len
 local ngx_req = ngx.req
-local md5 = ndk.set_var.set_md5
+local ndk_set = ndk.set_var
+local md5 = ndk_set.set_md5
 ngx_req.read_body()
 ngx_header.content_type = 'text/html'
 local redis
@@ -129,7 +130,7 @@ end)
 r:match('POST','/user/login',function(params)
     --local args = ngx_req.get_uri_args()
     local args = ngx_req.get_post_args()
-    local username = ndk.set_var.set_quote_sql_str(args['username'] or '')
+    local username = ndk_set.set_quote_sql_str(args['username'] or '')
     local pass = args['password'] or ''
     local err,err_code
     if len(username)  < 3 then
@@ -147,7 +148,7 @@ r:match('POST','/user/register',function()
     local err_code = 200
     local args = ngx_req.get_uri_args()
     --local args =  ngx_req.get_post_args()
-    local username = ndk.set_var.set_quote_sql_str(args['username'] or '')
+    local username = ndk_set.set_quote_sql_str(args['username'] or '')
     local pass = args['password'] or ''
      if len(username)  < 3 then
         err = '用户名长度不够'
@@ -179,7 +180,7 @@ r:match('POST','/user/category',function()
         json_error(err,err_code)
     end
     open_mysql()
-    local sql = format("insert into cc_stockGroup(name,uid,created_at,status,public) values(%s,%d,localtime(),1,1);",ndk.set_var.set_quote_sql_str(name),user_id);
+    local sql = format("insert into cc_stockGroup(name,uid,created_at,status,public) values(%s,%d,localtime(),1,1);",ndk_set.set_quote_sql_str(name),user_id);
     local res, err = db:query(sql)
     if not res or res.affected_rows ==0 then
       json_error('保持失败',400)
@@ -227,7 +228,7 @@ local function update_stock_cache(sg_id)
 end
 r:match('DELETE','/user/favor/:sg_id/:cpy_id',function(params)
     local sg_id = tonumber(params.sg_id)
-    local cpy_id = ndk.set_var.set_quote_sql_str(tostring(params.cpy_id))
+    local cpy_id = ndk_set.set_quote_sql_str(tostring(params.cpy_id))
     local uid = auth_check()
     open_mysql()
     local sql = format("update cc_user_stock set status = 0 where sg_id = %d and cpy_id = %s and uid = %d ;",sg_id,cpy_id,uid)
@@ -247,7 +248,7 @@ r:match('POST','/user/favor/:cpy_id',function(params)
        json_error('参数错误',400)
        ngx.exit(200)
     end
-    local sql = format("select id from cc_user_stock where sg_id = %d and cpy_id = %s and uid = %d and status =1 limit 1;",sg_id,ndk.set_var.set_quote_sql_str(tostring(params.cpy_id)),user_id)
+    local sql = format("select id from cc_user_stock where sg_id = %d and cpy_id = %s and uid = %d and status =1 limit 1;",sg_id,ndk_set.set_quote_sql_str(tostring(params.cpy_id)),user_id)
     open_mysql()
     res, err, errno, sqlstate = db:query(sql)
     if res and #res > 0 then
@@ -255,7 +256,7 @@ r:match('POST','/user/favor/:cpy_id',function(params)
         return true
     end
 
-    sql = format("insert into cc_user_stock(uid,cpy_id,created_at,sg_id) values(%d,%s,localtime(),%d);",user_id,ndk.set_var.set_quote_sql_str(tostring(params.cpy_id)),sg_id)
+    sql = format("insert into cc_user_stock(uid,cpy_id,created_at,sg_id) values(%d,%s,localtime(),%d);",user_id,ndk_set.set_quote_sql_str(tostring(params.cpy_id)),sg_id)
     res, err, errno, sqlstate = db:query(sql)
     if not res then
        json_error('添加失败',400)
