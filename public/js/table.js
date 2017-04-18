@@ -1,5 +1,5 @@
-$(function() {
-  
+$(function () {
+
     var inteval = null;
 
     function jsk(aoData) {
@@ -52,7 +52,7 @@ $(function() {
         "processing": true, //载入数据的时候是否显示“载入中”
         "serverSide": true, //生成get数据
         "columns": table_info.columns,
-        "fnServerData": function(sSource, aoData, fnCallback) {
+        "fnServerData": function (sSource, aoData, fnCallback) {
             console.log(table_info.stock_url);
             $.ajax({
                     url: table_info.stock_url,
@@ -60,42 +60,42 @@ $(function() {
                     dataType: 'json',
                     data: jsk(aoData),
                 })
-                .done(function(resp) {
+                .done(function (resp) {
                     fnCallback(resp);
                 })
-                .fail(function() {
+                .fail(function () {
 
                     layer.msg('获取数据失败');
                 })
-                .always(function() {
+                .always(function () {
                     console.log("complete");
                 });
 
 
         },
-        "fnRowCallback": function(nRow, aData, iDisplayIndex) {
+        "fnRowCallback": function (nRow, aData, iDisplayIndex) {
             var page = table_info.current.page();
             var page_len = table_info.current.page.len();
             $('td:eq(0)', nRow).text(page * page_len + iDisplayIndex + 1);
 
-            $('td:eq(11)', nRow).addClass('cpy_id').attr('data', aData['cpy_id']).on('click', function() {
+            $('td:eq(11)', nRow).addClass('cpy_id').attr('data', aData['cpy_id']).on('click', function () {
                 var self = this;
                 var cpy_id = $(this).attr('data');
                 var cpy_name = $(this).attr("cpy_name");
                 var _title = $(self).text();
                 if (_title == '取消关注') {
-                    Vue.http.delete('/user/favor/'+app.$data.favorselectIndex + '/' + cpy_id).then(function($resp){
+                    Vue.http.delete('/user/favor/' + app.$data.favorselectIndex + '/' + cpy_id).then(function ($resp) {
                         layer.msg($resp.body.message)
-                        if($resp.body.status == 200 ){
-                            setTimeout(function(){
+                        if ($resp.body.status == 200) {
+                            setTimeout(function () {
                                 table_info.current.ajax.reload();
-                            },2000);
+                            }, 2000);
                         }
-                    }).catch(function($resp){
+                    }).catch(function ($resp) {
                         alert("删除失败");
                     });
-                   
-                    return alert('cancel');
+
+                    return false;
                 }
                 var layer_index = layer.open({
                     type: 1,
@@ -103,23 +103,25 @@ $(function() {
                     content: $("#favor"),
                     area: ['345px', '435px'],
                     btn: ['新建', '确认'],
-                    yes: function(index, layero) {
+                    yes: function (index, layero) {
                         layer.prompt({
                             title: '新建收藏夹'
-                        }, function(value, iindex, elem) {
+                        }, function (value, iindex, elem) {
                             if (!value || value == '') {
 
 
                                 return false;
                             }
-                            Vue.http.post('/user/category', { name: value }, {
+                            Vue.http.post('/user/category', {
+                                name: value
+                            }, {
                                 headers: {
                                     "Content-type": "application/x-www-form-urlencoded"
                                 }
-                            }).then(function(resp) {
+                            }).then(function (resp) {
                                 if (resp.body.status == 400) {
                                     layer.msg(resp.body.message);
-                                    setTimeout(function() {
+                                    setTimeout(function () {
                                         login();
                                     }, 3000);
 
@@ -128,7 +130,7 @@ $(function() {
 
                                 }
 
-                            }, function(resp) {
+                            }, function (resp) {
                                 layer.msg('网络连接失败!!!');
                             });
 
@@ -136,7 +138,7 @@ $(function() {
                         });
 
                     },
-                    btn2: function() {
+                    btn2: function () {
                         if (app.save_favor(cpy_id)) {
                             return true;
                         }
@@ -151,30 +153,30 @@ $(function() {
             return nRow;
         }
     });
-   
+
 
     try {
-    
+
         if (typeof table_info !== undefined && table_info.current) {
             console.log('ok');
-            inteval = setInterval(function() {
+            inteval = setInterval(function () {
                 var d = new Date();
                 var h = d.getHours();
                 var m = d.getMinutes();
-                if(h < 9 ){
+                if (h < 9) {
                     clearInterval(inteval);
                 }
-                if(!(h == 11 && m <=30)){
+                if (!(h == 11 && m <= 30)) {
                     clearInterval(inteval);
-                    return ;
+                    return;
                 }
-                if(h == 12){
+                if (h == 12) {
                     clearInterval(inteval);
-                    return ;
+                    return;
                 }
-                if((h >=15 &&  m > 0)){
+                if ((h >= 15 && m > 0)) {
                     clearInterval(inteval);
-                    return ;
+                    return;
                 }
                 app.reflushTime();
                 table_info.current.ajax.reload();

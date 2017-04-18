@@ -228,17 +228,23 @@ local function update_stock_cache(sg_id)
 end
 r:match('DELETE','/user/favor/:sg_id/:cpy_id',function(params)
     local sg_id = tonumber(params.sg_id)
-    local cpy_id = ndk_set.set_quote_sql_str(tostring(params.cpy_id))
+    local cpy_id = params.cpy_id
     local uid = auth_check()
-    open_mysql()
-    local sql = format("update cc_user_stock set status = 0 where sg_id = %d and cpy_id = %s and uid = %d ;",sg_id,cpy_id,uid)
-    local res, err, errno ,sqlstate = db:query(sql)
-    if not res or res.affected_rows == 0 then
-        json_error(sql,400)
-        return 
+    -- open_mysql()
+    -- local sql = format("update cc_user_stock set status = 0 where sg_id = %d and cpy_id = %s and uid = %d ;",sg_id,cpy_id,uid)
+    -- local res, err, errno ,sqlstate = db:query(sql)
+    -- if not res or res.affected_rows == 0 then
+    --     json_error(sql,400)
+    --     return 
+    -- end
+    local res, err = redis:srem(format('us:%d',sg_id),cpy_id)
+    if res and tonumber(res) > 0 then
+        json_suc("删除成功" ,200)
+    else
+        json_error("操作失败",400)
     end
-    json_suc("删除成功" ,200)
-    update_stock_cache(sg_id)
+    return true
+    --update_stock_cache(sg_id)
 end);
 r:match('POST','/user/favor/:cpy_id',function(params)
     local args = ngx_req.get_post_args()
@@ -248,28 +254,36 @@ r:match('POST','/user/favor/:cpy_id',function(params)
        json_error('参数错误',400)
        ngx.exit(200)
     end
-    local sql = format("select id from cc_user_stock where sg_id = %d and cpy_id = %s and uid = %d and status =1 limit 1;",sg_id,ndk_set.set_quote_sql_str(tostring(params.cpy_id)),user_id)
-    open_mysql()
-    res, err, errno, sqlstate = db:query(sql)
-    if res and #res > 0 then
-        json_error("已订阅",400)
-        return true
-    end
+   local ok , err = redis:sadd(format('us:%d',sg_id),params.cpy_id)
 
-    sql = format("insert into cc_user_stock(uid,cpy_id,created_at,sg_id) values(%d,%s,localtime(),%d);",user_id,ndk_set.set_quote_sql_str(tostring(params.cpy_id)),sg_id)
-    res, err, errno, sqlstate = db:query(sql)
-    if not res then
-       json_error('添加失败',400)
-       ngx.eof()
-       ngx.log(ngx.ERR,err .. ' ' ..sqlstate)
-       return true
+
+   if tonumber(ok) > 0 then
+        json_suc('添加成功',200)
+    else
+        json_error("添加失败",400)
     end
+    -- local sql = format("select id from cc_user_stock where sg_id = %d and cpy_id = %s and uid = %d and status =1 limit 1;",sg_id,ndk_set.set_quote_sql_str(tostring(params.cpy_id)),user_id)
+    -- open_mysql()
+    -- res, err, errno, sqlstate = db:query(sql)
+    -- if res and #res > 0 then
+    --     json_error("已订阅",400)
+    --     return true
+    -- end
+
+    -- sql = format("insert into cc_user_stock(uid,cpy_id,created_at,sg_id) values(%d,%s,localtime(),%d);",user_id,ndk_set.set_quote_sql_str(tostring(params.cpy_id)),sg_id)
+    -- res, err, errno, sqlstate = db:query(sql)
+    -- if not res then
+    --    json_error('添加失败',400)
+    --    ngx.eof()
+    --    ngx.log(ngx.ERR,err .. ' ' ..sqlstate)
+    --    return true
+    -- end
 
    
-    if res.affected_rows >  0 then
-      json_suc('添加成功',200)
-      update_stock_cache(sg_id)
-    end
+    -- if res.affected_rows >  0 then
+    --   json_suc('添加成功',200)
+    --   update_stock_cache(sg_id)
+    -- end
     return true
 end);
 local ok, errmsg = r:execute(
