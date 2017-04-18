@@ -20,8 +20,6 @@ $(function () {
             } else {
                 arr[k] = aoData[i].value
             }
-
-
         }
         return arr
     }
