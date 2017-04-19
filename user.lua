@@ -23,28 +23,28 @@ end
 local function json_error(err,err_code)
     json_suc(err,err_code,nil) 
 end
+local function get_auth_token()
+     local headers = ngx_req.get_headers()
+     local authToken = headers['Authorization'];
+    return authToken or '';
+end
 local function auth_check()
     local headers = ngx_req.get_headers()
     local authToken = headers['Authorization'];
     redis = require("redis_db").new()
     redis:select(2)
-    local ok = redis:hexists('login:',authToken)
+    local ok = redis:exists(format('token:%s',authToken))
 
     if ok ~= 1 then
         json_error('未登录',400)
         ngx.exit(200)
     end
-    local _str  = redis:hget('login:',authToken)
+    local _str  = redis:get(format('login:%s',authToken))
     if not _str then    
          json_error('未登录',400)
         ngx.exit(200)
     end
-    local res = json.decode(_str)
-     if not res then    
-         json_error('未登录',400)
-        ngx.exit(200)
-    end
-    return res['id'];
+    return _str,authToken;
 end
 local function open_mysql()
   if db then return db end
@@ -89,11 +89,18 @@ local function login(username,password)
       return 
   end
   sql = format("update cc_user set total_login = total_login + 1 ,login_IP = '%s' , login_time = localtime() ",ip)
-  local res  = db:query(sql)
-  local token = md5(res[1]['id'])
+  db:query(sql)
+  local token = md5(ip .. res[1]['id'])
   local redis = require('redis_db').new()
   redis:select(2)
-  redis:hset("login:",token,json.encode(res[1]))
+  local login_key = format('login:%s',token)
+  local token_info = format('token:%s',token)
+  redis:init_pipeline()
+  redis:set(format('login:%s',token),res[1]['id'])
+  redis:expire(login_key,ngx.time()+3*3600*24)
+  redis:set(token_info,json.encode(res[1]))
+  redis:expire(token_info,ngx.time()+3*3600*24)
+  redis:commit_pipeline()
   redis:select(0)
   json_suc('登录成功',200,{['token'] = token,['userID'] = res[1]['id']})
 end
@@ -113,19 +120,27 @@ local function register(username,password,mobile)
     json_suc('注册成功',200)
     return true
 end
+r:match('GET','/user/logoff',function()
+    local user_id,token = auth_check()
+    redis:init_pipeline()
+    redis:del(format('login:%s',token))
+    redis:del(format('token:%s',token))
+    redis:commit_pipeline()
+    return true
+end)
 r:match('GET','/user/info',function(params)
-      local user_id = auth_check()
-      local info, err = redis:hget("login:",md5(user_id))
+      local user_id,token = auth_check()
+      local info, err = redis:get(format('login:%s',token))
       if not info then
           json_error('error',400)
       end
+      local info =  redis:get(format('token:%s',token))
       local user_info = json.decode(info)
       local _send = {
         ['username'] = user_info['username'],
         ['id'] = user_info['id']
       }
       json_suc('success',200,_send)
-
 end)
 r:match('POST','/user/login',function(params)
     --local args = ngx_req.get_uri_args()
@@ -209,37 +224,30 @@ r:match('GET','/user/category',function()
     -- end
 
     --local redis = require('redis_db').new()
-    local res, err = redis:get('usr:'..user_id ..':stockGroup')
+    local _key = 'usr:'..user_id ..':stockGroup'
+    local res, err = redis:get(_key)
+    if not res then
+        open_mysql()
+        local sql = format("select id,name from cc_stockGroup where uid = %s  and status > 0 ",user_id)
+        re, err = db:query(sql)
+        res = json.encode(re)
+        redis:set(_key,res)
+        redis:expire(_key,ngx.time()+3600*24*3)
+    end
     json_suc('success',200,res or '')
 end)
-local function update_stock_cache(sg_id)
-    local sql = "select id,cpy_id from cc_user_stock where status = 1 and sg_id = " ..sg_id
 
-     local res, err, errno, sqlstate = db:query(sql)
-      
-      if res  then
-            local _t = {}
-            for _,v in ipairs(res) do
-              _t[tostring(v['cpy_id'])] = v['id']
-            end
-            redis:set(format('us:%d',sg_id),json.encode(_t))
-      end
-
-end
 r:match('DELETE','/user/favor/:sg_id/:cpy_id',function(params)
     local sg_id = tonumber(params.sg_id)
     local cpy_id = params.cpy_id
-    local uid = auth_check()
-    -- open_mysql()
-    -- local sql = format("update cc_user_stock set status = 0 where sg_id = %d and cpy_id = %s and uid = %d ;",sg_id,cpy_id,uid)
-    -- local res, err, errno ,sqlstate = db:query(sql)
-    -- if not res or res.affected_rows == 0 then
-    --     json_error(sql,400)
-    --     return 
-    -- end
+    local user_id = auth_check()
     local res, err = redis:srem(format('us:%d',sg_id),cpy_id)
     if res and tonumber(res) > 0 then
         json_suc("删除成功" ,200)
+        ngx.eof()
+        open_mysql()
+        local sql = format("update cc_user_stock set status = 0 where sg_id = %d and cpy_id = %s and uid = %d ;",sg_id,cpy_id,user_id)
+        db:query(sql)
     else
         json_error("操作失败",400)
     end
@@ -259,6 +267,10 @@ r:match('POST','/user/favor/:cpy_id',function(params)
 
    if tonumber(ok) > 0 then
         json_suc('添加成功',200)
+        ngx.eof()
+        open_mysql()
+        sql = format("insert into cc_user_stock(uid,cpy_id,created_at,sg_id) values(%d,%s,localtime(),%d);",user_id,ndk_set.set_quote_sql_str(params.cpy_id),sg_id)
+        res, err, errno, sqlstate = db:query(sql)
     else
         json_error("添加失败",400)
     end

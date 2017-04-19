@@ -39,10 +39,24 @@ $(function(){
 
     }
     shutdown = function() {
+        if(localStorage.token){
+             Vue.http.headers.common['Authorization'] = localStorage['token'];
+        }else{
+            return false;
+        }
+       
         if (localStorage.userID) {
             destoryStorage();
         }
-        window.location = "/user/logoff";
+        Vue.http.get('/user/logoff').then(function(resp){
+
+        }).catch(function(resp){
+            
+        }).finally(function(resp){
+            window.location = "/";
+        });
+        
+        
     }
     layui.use(['element', 'form'], function() {
         var element = layui.element();
