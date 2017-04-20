@@ -38,6 +38,11 @@
                         <a href="javascript:;">自选股</a>
                         <dl class="layui-nav-child">
                             <dd  class="layui-this"><a href="javascript:;" @click="favor_click(0,0)">默认</a></dd>
+                            {% for k,v in ipairs(publicGroup) do %}
+                            <dd> 
+                                <a href="javascript:;" v-bind:data="{{v.id}}" @click="favor_click({{v.id}},0);" > {{v.name}} </a>
+                            </dd>
+                            {% end %}
                             <template v-for="item in userFavor">
                             {-raw-}
                                 <dd>

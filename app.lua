@@ -5,6 +5,8 @@ local byte = string.byte
 local sub = string.sub
 local tb_insert = table.insert
 local template = require "resty.template"
+local redis = require("redis_db").new()
+local json = require('rapidjson')
 template.caching(false)
 
 ngx.req.read_body()
@@ -16,7 +18,14 @@ r:match('GET','/',function()
   -- local header = template.compile 'view/base_header.tpl' {}
   
    -- local filename = ngx.var.document_root.."/view/index.html"
-
+   redis:select(2)
+   local _cache = redis:get('publicGroup')
+   local public 
+   if not _cache then 
+      public = {}
+   else
+      public = json.decode(_cache)
+   end
    local view = template.new('view/index.html')
    view:render({
       title = "主力动向观测站",
@@ -26,7 +35,8 @@ r:match('GET','/',function()
           {key = "分时DDX(主力强度)",url = "/ddx.html"},
           {key = "逆势主力资金流",url = "nxzl.html"}
         }
-      }   
+      },
+      publicGroup = public  
     });
     -- local view = template.new('view/index.html')
     -- view:render()
@@ -88,7 +98,7 @@ r:match('GET','/echarts_search',function(params)
   local args = ngx.req.get_uri_args()
   local begin = args['begin'] or '9,15'
   local finish = args['finish'] or '13,00'
-  local redis = require("redis_db").new()
+  redis:select(0)
   if byte(begin,1,1) == 48 then
       begin = sub(begin,2)
   end

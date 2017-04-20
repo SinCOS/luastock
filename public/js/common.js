@@ -231,6 +231,7 @@ $(function(){
                 } else if (_private == 0) {
                     table_info.stock_url = stock_url + '/' + id + '/0';
                     this.favorClickIndex = false;
+                    table_info.current.ajax.reload();
                 } else {
                     table_info.stock_url = stock_url + '/' + id;
                     this.favorClickIndex = true;
