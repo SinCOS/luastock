@@ -7,95 +7,75 @@ local tb_insert = table.insert
 local template = require "resty.template"
 local redis = require("redis_db").new()
 local json = require('rapidjson')
+local ngx_req= ngx.req
 template.caching(false)
 
-ngx.req.read_body()
-ngx.header.content_type = 'text/html'
+ngx_req.read_body()
 local r = route.new()
 local stock_cache = ngx.shared.stock_cache
 
-r:match('GET','/',function()
-  -- local header = template.compile 'view/base_header.tpl' {}
-  
-   -- local filename = ngx.var.document_root.."/view/index.html"
-   redis:select(2)
-   local _cache = redis:get('publicGroup')
-   local public 
-   if not _cache then 
+ngx.header.content_type = 'text/html; charset=utf-8'
+
+local function get_Menu()
+  redis:select(2)
+  local _cache = redis:get('publicGroup')
+  local public 
+  if not _cache then 
       public = {}
-   else
+  else
       public = json.decode(_cache)
-   end
-   local view = template.new('view/index.html')
-   view:render({
+  end
+  return {
       title = "主力动向观测站",
       url = {
         ['list'] = {
           {key = "主力资金净流入",url = "/"},
           {key = "分时DDX(主力强度)",url = "/ddx.html"},
-          {key = "逆势主力资金流",url = "nxzl.html"}
+          {key = "逆势主力资金流",url = "nszl.html"}
         }
       },
       publicGroup = public  
-    });
-    -- local view = template.new('view/index.html')
-    -- view:render()
+  }
+end
+r:match('GET','/',function()
+   local menu = get_Menu()
+   local view = template.new('view/index.html')
+   view:render(menu);
 end);
 
 r:match('GET','/echarts',function()
 
-
+  local menu = get_Menu()
   local view = template.new('view/echarts.html')
-   view:render({
-      title = "主力动向观测站",
-      url = {
-        ['list'] = {
-          {key = "主力资金净流入",url = "/"},
-          {key = "分时DDX(主力强度)",url = "/ddx.html"},
-          {key = "逆势主力资金流",url = "nxzl.html"}
-        }
-      }   
-    });
+  view:render(menu);
 end)
 r:match('GET','/ddx.html',function()
+  local menu = get_Menu()
   local view = template.new('view/ddx.html')
-   view:render({
-      title = "主力动向观测站",
-      url = {
-        ['list'] = {
-          {key = "主力资金净流入",url = "/"},
-          {key = "分时DDX(主力强度)",url = "/ddx.html"},
-          {key = "逆势主力资金流",url = "nxzl.html"}
-        }
-      }   
-    });
+  view:render(menu);
 end)
-r:match("GET", '/nxzl.html',function()
+r:match("GET", '/nszl.html',function()
+ local menu = get_Menu()
   local view = template.new('view/nxzl.html')
-   view:render({
-      title = "主力动向观测站",
-      url = {
-        ['list'] = {
-          {key = "主力资金净流入",url = "/"},
-          {key = "分时DDX(主力强度)",url = "/ddx.html"},
-          {key = "逆势主力资金流",url = "nxzl.html"}
-        }
-      }   
-    });
+  view:render(menu);
 end)
 r:match('GET','cache',function()
   
-  ngx.say(ngx.localtime())
-  ngx.say('from memcached.')
+  redis:select(0)
+  local cache = redis:get('last_news')
+  ngx.say(cache);
 end)
 r:match('GET','/news',function(params)
-    local view = template.new('view/news.html')
-    view:render({})
+  redis:select(0)
+  local cache = redis:get('last_news')
+  local news = json.decode(cache)
+  local view = template.new('view/news.html')
+   view:render({
+      news = news
+    })
 end)
 r:match('GET','/echarts_search',function(params)
-
-  local json = require('rapidjson')
-  local args = ngx.req.get_uri_args()
+  local args = ngx_req.get_uri_args()
   local begin = args['begin'] or '9,15'
   local finish = args['finish'] or '13,00'
   redis:select(0)
@@ -111,7 +91,7 @@ r:match('GET','/echarts_search',function(params)
   local ok, err = redis:get(md5_key)
   if ok then 
     ngx.say(ok)
-    ngx.exit(200)
+    return true
   end 
 
 
@@ -121,12 +101,12 @@ r:match('GET','/echarts_search',function(params)
   local db = require("lsqlite3").open(db_path)
   if not db then 
     ngx.say('db nil ',db_path) 
-    ngx.exit(200)
+    return true
   end
   local _temp = stock_cache:get('cpy_name')
 
   if not _temp then 
-    return
+    return true
   end
   local cpy_name = json.decode(_temp)
   local _t = {}
@@ -150,22 +130,22 @@ r:match('GET','/echarts_search',function(params)
    end
    vv =  k['cpy_id']
   end
-  db:close()
-  db = nil
+
   local res = json.encode(_t)
   ngx.say(res)
   ngx.eof()
+  db:close()
+  db = nil
   redis:set(md5_key,res)
   redis:expire(md5_key,_current_time+3600*3)
-  
 end)
 
 function main()
   local ok, errmsg = r:execute(
         ngx.var.request_method,
         ngx.var.uri,
-        ngx.req.get_uri_args(),  -- all these parameters
-        ngx.req.get_post_args()
+        ngx_req.get_uri_args(),  -- all these parameters
+        ngx_req.get_post_args()
 )         -- into a single "params" table
 
       if ok then
@@ -174,6 +154,10 @@ function main()
           ngx.status = 200
           ngx.say(errmsg)
           ngx.log(ngx.ERR, errmsg)
+      end
+      
+      if redis then
+        redis:select(0)
       end
 end
 
