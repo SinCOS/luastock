@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{title}}</title>
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="/public/layui/css/layui.css" media="all">
+    {* blocks.page_css *}
+    <!--<script src="//code.jquery.com/jquery.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/bs-3.3.5/jq-2.1.4,dt-1.10.8/datatables.min.css">
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<style type="text/css">
+.layui-nav {
+    margin-left: 0px;
+}
+
+.header {
+    height: 60px;
+    border-bottom: none;
+}
+
+.layui-nav-right {
+    position: absolute;
+    right: 0px;
+    top: 0;
+}
+
+.tb_body {
+    padding: 15px;
+}
+</style>
+
+<body>
+    <div class="layui-layout layui-layout-admin" id='app'>
+        {(view/menu.html)}
+        
+        {* blocks.main *}
+       
+    
+      
+          {(view/public_div.html)}
+    </div>
+    
+</body>
+
+<script src="https://cdn.jsdelivr.net/vue.resource/1.2.1/vue-resource.min.js"></script>
+<script src="/public/layui/layui.js" charset="utf-8"></script>
+
+{* blocks.page_js *}
+</html>

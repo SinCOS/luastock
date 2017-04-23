@@ -61,15 +61,15 @@ $(function(){
     layui.use(['element', 'form'], function() {
         var element = layui.element();
         var form = layui.form();
+        form.verify({
+            username: function(value){
+                if($.trim(value).length < 3){
+                    return '用户名至少3个字符';
+                }
+            },
+            pass: [/(.+){6,12}$/, '密码必须6到12位']
+        });
         form.on('submit(formDemo)', function(data) {
-            if (data.field.username.length < 5) {
-                layer.msg('用户名长度不能少于5个字符');
-                return false;
-            }
-            if (data.field.password.length < 6) {
-                layer.msg('密码长度太短');
-                return false;
-            }
             $.post('/user/login', data.field, function(data, textStatus, xhr) {
                 if (data.status == 200) {
                     localStorage['userID'] = data.result.userID;
@@ -83,8 +83,12 @@ $(function(){
             }, 'json');
             return false;
         });
-        form.on('submit(register_frm)', function(data) {
-            
+        form.on('submit(regfrm)', function(data) {
+            $.post('/user/register',data.field,function(data,status){
+                alert(data);
+            });
+            alert('false');
+            return false;
         });
 
     });

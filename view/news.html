@@ -1,16 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    <ul>
-        {% for _,v in pairs(news or {}) do %}
-        <li>{{v.classify}} <a href="{{v.url}}"> {{v.title}} </a></li>
-        {% end %}
-    </ul>
-</body>
-</html>
+ {% layout = 'view/base.html' %} {-main-}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+  <ul class="layui-tab-title">
+    <li class="layui-this">证券</li>
+    <li>美股</li>
+    <li>国内财经</li>
+    
+  </ul>
+  <div class="layui-tab-content" style="height: 100px;">
+    <div class="layui-tab-item layui-show">
+        <ol>
+                {% for _,v in pairs(news or {}) do %}
+                    {% if v.classify == '证券'  then %}
+                        <li>{{v.classify}} <a href="{{v.url}}"> {{v.title}} </a></li>
+                    {% end %}
+                {% end %}
+            </ol></div>
+    <div class="layui-tab-item">
+         <ol>
+                {% for _,v in pairs(news or {}) do %}
+                    {% if v.classify == '美股'  then %}
+                        <li>{{v.classify}} <a href="{{v.url}}" title="{{v.title}}"> {{v.title}} </a></li>
+                    {% end %}
+                {% end %}
+            </ol>
+    </div>
+    <div class="layui-tab-item">
+         <ol>
+                {% for _,v in pairs(news or {}) do %}
+                    {% if v.classify == '国内财经'  then %}
+                        <li>{{v.classify}} <a href="{{v.url}}"> {{v.title}} </a></li>
+                    {% end %}
+                {% end %}
+            </ol>
+    </div>
+            {{news[1].content}}
+  </div>
+</div> 
+            
+        </div>
+    </div>
+</div>
+
+{-main-} {-page_js-}
+<script>
+    var curPage = '/news';
+    var $ = null;
+    layui.use(['element', 'jquery'], function () {
+        var element = layui.element;
+        $ = layui.jquery;
+        if (window.location.href.indexOf(curPage) > 0) {
+            $('.layui-nav li').each(function () {
+                if ($(this).children('a').attr('href') == curPage) {
+                    $(this).children('a').addClass('layui-this');
+                    return false;
+                }
+
+            });
+        }
+        $.get('/cache', function (data, status) {
+            console.log(data);
+        });
+    })
+    
+</script>
+{-page_js-}

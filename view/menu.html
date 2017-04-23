@@ -2,7 +2,7 @@
             <div class="layui-main" style="margin: 0px;">
                 <ul class="layui-nav ">
                     <li class="layui-nav-item"><a href="javascript:void;">主力追踪</a></li>
-                    <li class="layui-nav-item layui-this">
+                    <li class="layui-nav-item">
                         <a href="javascript:;">数据中心</a>
                         <dl class="layui-nav-child">
                             {% for _,v in ipairs(url.list) do %}
@@ -31,6 +31,7 @@
                 </ul>
             </div>
         </div>
+        {% if  leftNav  then %}
         <div class="layui-side layui-bg-black">
             <div class="layui-side-scroll">
                 <ul class="layui-nav layui-nav-tree" lay-filter="demo">
@@ -65,3 +66,4 @@
                 </ul>
             </div>
         </div>
+        {% end %}

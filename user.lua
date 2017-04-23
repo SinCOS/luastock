@@ -1,6 +1,7 @@
 local route = require('router')
 local template = require "resty.template" 
 local json = require('rapidjson')
+local validation = require('resty.validation')
 template.caching(true)
 local format = string.format
 local ngx_header  = ngx.header
@@ -106,7 +107,7 @@ local function login(username,password)
 end
 local function register(username,password,mobile)
     open_mysql()
-    local res,err = db:query(format('select id from cc_user where username = %s',username))
+    local res,err = db:query(format('select id from cc_user where username = %s limit 1;',username))
     if not res or #res > 0 then
       json_error('用户已存在',400)
       return true
@@ -161,9 +162,9 @@ end);
 r:match('POST','/user/register',function()
     local err =''
     local err_code = 200
-    local args = ngx_req.get_uri_args()
-    --local args =  ngx_req.get_post_args()
-    local username = ndk_set.set_quote_sql_str(args['username'] or '')
+    --local args = ngx_req.get_uri_args()
+    local args =  ngx_req.get_post_args()
+    local username = args['username'] or ''
     local pass = args['password'] or ''
      if len(username)  < 3 then
         err = '用户名长度不够'
@@ -177,28 +178,31 @@ r:match('POST','/user/register',function()
          return true
     end
     local password = md5(pass)
-    register(username,password)
+    register(ndk_set.set_quote_sql_str(username),password)
     return true
 
 end)
 r:match('POST','/user/category',function()
     local args = ngx_req.get_post_args()
     local user_id = auth_check()
-    local name = args['name'] or ''
+    
+    local ok,name = validation.trim(args['name']) 
     local err = ''
     local err_code = 200
-    if len(name) == 0 then
+    if not ok or  len(name) == 0 then
         err_code = 400
         err = '非法访问'
     end
     if err_code ~= 200 then
         json_error(err,err_code)
+        return true
     end
     open_mysql()
     local sql = format("insert into cc_stockGroup(name,uid,created_at,status,public) values(%s,%d,localtime(),1,1);",ndk_set.set_quote_sql_str(name),user_id);
     local res, err = db:query(sql)
     if not res or res.affected_rows ==0 then
       json_error('保持失败',400)
+      return true
     end
     json_suc('保存成功',200) 
     ngx.eof()
@@ -236,7 +240,13 @@ r:match('GET','/user/category',function()
     end
     json_suc('success',200,res or '')
 end)
-
+r:match('PUT','/user/group/rename/:sg_id',function(params)
+    local args = ngx_req.get_uri_args()
+    local sg_id = tonumber(params.sg_id)
+    local name = args['name'] or ''
+    local ok , err = validation.string.trim.len(2)
+    ngx.say(ok,err)
+end)
 r:match('DELETE','/user/favor/:sg_id/:cpy_id',function(params)
     local sg_id = tonumber(params.sg_id)
     local cpy_id = params.cpy_id

@@ -27,6 +27,7 @@ local function get_Menu()
   end
   return {
       title = "主力动向观测站",
+      leftNav = true,
       url = {
         ['list'] = {
           {key = "主力资金净流入",url = "/"},
@@ -44,8 +45,8 @@ r:match('GET','/',function()
 end);
 
 r:match('GET','/echarts',function()
-
   local menu = get_Menu()
+  menu.leftNav = false
   local view = template.new('view/echarts.html')
   view:render(menu);
 end)
@@ -60,24 +61,28 @@ r:match("GET", '/nszl.html',function()
   view:render(menu);
 end)
 r:match('GET','cache',function()
-  
+  ngx.say(ngx.today())
   redis:select(0)
   local cache = redis:get('last_news')
   ngx.say(cache);
 end)
 r:match('GET','/news',function(params)
+  local menu = get_Menu()
   redis:select(0)
   local cache = redis:get('last_news')
-  local news = json.decode(cache)
+  menu.news = json.decode(cache)
+  menu.leftNav = false
   local view = template.new('view/news.html')
-   view:render({
-      news = news
-    })
+   view:render(menu)
+end)
+r:match('GET','/news/:id.html',function(params)
+
 end)
 r:match('GET','/echarts_search',function(params)
   local args = ngx_req.get_uri_args()
-  local begin = args['begin'] or '9,15'
-  local finish = args['finish'] or '13,00'
+  local begin = args['begin'] or '09:15'
+  local finish = args['finish'] or '13:00'
+  local _type =  args['type'] == 'jlr' and 'jlr' or 'zlbfb'
   redis:select(0)
   if byte(begin,1,1) == 48 then
       begin = sub(begin,2)
@@ -85,7 +90,7 @@ r:match('GET','/echarts_search',function(params)
   if byte(finish,1,1) == 48 then
       finish = sub(finish,2)
   end 
-  local sql = format("select cpy_id,zlbfb,zf,zs from cc_stock_info where addtime in ('%s','%s') and cpy_id <> '' order by cpy_id,addtime   limit 5914 ;",begin,finish);
+  local sql = format("select cpy_id,%s,zf,zs from cc_stock_info where addtime in ('%s','%s') and cpy_id <> '' order by cpy_id,addtime   limit 5914 ;",_type,begin,finish);
   local md5_key = ngx.md5('sql:'..sql)
   redis:select(0)
   local ok, err = redis:get(md5_key)
@@ -93,10 +98,9 @@ r:match('GET','/echarts_search',function(params)
     ngx.say(ok)
     return true
   end 
-
-
   local _current_time = ngx.time()
   local _current_table = os.date("*t",_current_time)
+  --local db_path = format('/usr/local/openresty/nginx/lua/%02d%02d.db',4,19)
   local db_path = format('/usr/local/openresty/nginx/lua/%02d%02d.db',_current_table['month'],_current_table['day'])
   local db = require("lsqlite3").open(db_path)
   if not db then 
@@ -114,6 +118,7 @@ r:match('GET','/echarts_search',function(params)
   local _count = 1
   local i = 1
   local vv = ''
+  
   for k in db:nrows(sql) do
 
     if vv ~= k['cpy_id']  then
@@ -124,13 +129,12 @@ r:match('GET','/echarts_search',function(params)
       _count = _count + 1
    else
       local last  = _count -1
-     _t[last]['one'] = format("%.2f",tonumber(k['zlbfb']) - tonumber(_t[last]['zlbfb']))
+     _t[last]['one'] = format("%.2f",tonumber(k[_type]) - tonumber(_t[last][_type]))
      _t[last]['zs'] = format('%.2f',tonumber(k['zs']) - tonumber(_t[last]['zs']))
      _t[last]['zf'] = format('%.2f',tonumber(k['zf']) - tonumber(_t[last]['zf']))
    end
    vv =  k['cpy_id']
   end
-
   local res = json.encode(_t)
   ngx.say(res)
   ngx.eof()
