@@ -76,11 +76,9 @@ $(function () {
             var page_len = table_info.current.page.len();
             $('td:eq(0)', nRow).text(page * page_len + iDisplayIndex + 1);
             var $object = null;;
-            if(table_info.stock_url.indexOf('ddx')>=0){
-                $object = $('td:eq(9)',nRow);
-            }else{
-                $object = $('td:eq(11)',nRow);
-            }
+           
+            $object = $('td:eq(11)',nRow);
+            
             $object.addClass('cpy_id').attr('data', aData['cpy_id']).on('click', function () {
                 var self = this;
                 var cpy_id = $(this).attr('data');
@@ -151,11 +149,9 @@ $(function () {
                 return false;
             }).attr('cpy_name', aData['name']).text(app.$data.favorClickIndex ? '取消关注' : '关注');
             if (parseFloat(aData['zf']) > 0) {
-                if(table_info.stock_url.indexOf('ddx') >= 0){
-                    $('td:eq(7)', nRow).addClass('error');
-                }else{
+                
                      $('td:eq(9)', nRow).addClass('error');
-                }
+                
                
             }
             return nRow;

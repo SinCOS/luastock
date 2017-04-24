@@ -16,24 +16,24 @@
     <script type="text/javascript" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
 </head>
 <style type="text/css">
-.layui-nav {
-    margin-left: 0px;
-}
+    .layui-nav {
+        margin-left: 0px;
+    }
 
-.header {
-    height: 60px;
-    border-bottom: none;
-}
+    .header {
+        height: 60px;
+        border-bottom: none;
+    }
 
-.layui-nav-right {
-    position: absolute;
-    right: 0px;
-    top: 0;
-}
+    .layui-nav-right {
+        position: absolute;
+        right: 0px;
+        top: 0;
+    }
 
-.tb_body {
-    padding: 15px;
-}
+    .tb_body {
+        padding: 15px;
+    }
 </style>
 
 <body>
@@ -44,91 +44,102 @@
                 <thead>
                     <tr>
                         <th rowspan="2" colspan="3">说明:委托20万以上，成交的金额算做主力流入流出资金</th>
-                        <th >实时累计（万元）</th>
+                        <th>实时累计（万元）</th>
                         <th colspan="3">1分钟</th>
                         <th>3分钟</th>
                         <th> </th>
-                
+
                     </tr>
                     <tr>
-                        <th >15：00-9：30</th>
+                        <th></th>
+                        <th>15：00-9：30</th>
                         <th>9：32</th>
                         <th>9：31</th>
                         <th>9：30</th>
                         <th>9：32-9：30</th>
                         <th> </th>
                         <th></th>
+                        <th></th>
                     </tr>
                     <tr>
-                        <th style="width: 10px;">排名</th>
-                        <th style="width: 80px;">股票代码</th>
-                        <th style="width: 100px;">股票名称</th>
-                        <th style="width: 130px;" id="tab1">流入占比 %</th>
-                        <th style="width: 130px;" id="tab2">DDX</th>
-                        <th style="width: 130px;" id="tab3">DDX</th>
-                        <th style="width: 130px;">DDX</th>
-
-                        <th style="width: 60px;">涨幅</th>
-                        <th style="width: 60px;">涨速</th>
-                        <th style="width: 60px;">操作</th>
+                        <th>排名</th>
+                        <th>股票代码</th>
+                        <th>股票名称</th>
+                        <th>流入占比 %</th>
+                        <th>总DDX</th>
+                        <th>DDX</th>
+                        <th>DDX</th>
+                        <th>DDX</th>
+                        <th>DDX</th>
+                        <th>涨幅</th>
+                        <th>涨速</th>
+                        <th>操作</th>
                     </tr>
                 </thead>
             </table>
         </div>
         {(view/public_div.html)}
-        </div>
-        </body>
-        <script src="https://unpkg.com/vue/dist/vue.js"></script>
-        <script src="https://cdn.jsdelivr.net/vue.resource/1.2.1/vue-resource.min.js"></script>
-        <script src="/public/layui/layui.js" charset="utf-8"></script>
-        <script type="text/javascript" src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js"></script>
+    </div>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/vue.resource/1.2.1/vue-resource.min.js"></script>
+<script src="/public/layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js"></script>
 
-        <script type="text/javascript">
-        var stock_url ='/api/stock/ddx';
-        var table_info = {
-         stock_url: stock_url,
-         columns: [{
-                    "data": null,
-                    'orderable': false
-                }, {
-                    "data": "cpy_id"
-                }, {
-                    "data": "name"
-                }, {
-                    "data": 'zlbfb'
-                }, {
-                    "data": "one"
-                }, {
-                    "data": "two"
-                }, {
-                    "data": "three"
-                },  {
-                    "data": "zf"
-                }, {
-                    "data": "zs"
-                }, {
-                	'data': null,
-                	'orderable': false
-                }],
-         current: null
+<script type="text/javascript">
+    var stock_url = '/api/stock/ddx';
+    var table_info = {
+        stock_url: stock_url,
+        columns: [{
+                "data": null,
+                'orderable': false
+            }, {
+                "data": "cpy_id"
+            }, {
+                "data": "name"
+            },
+            {
+                'data': 'zlbfb'
+            },
+            {
+                "data": 'zljb'
+            },
+            {
+                'data': 'lst_ddxCache'
+            },
+            {
+                "data": "one"
+            }, {
+                "data": "two"
+            }, {
+                "data": "three"
+            }, {
+                "data": "zf"
+            }, {
+                "data": "zs"
+            }, {
+                'data': null,
+                'orderable': false
+            }
+        ],
+        current: null
     };
+</script>
+<script type="text/javascript" src="/public/js/common.js?v2.10"></script>
+<script type="text/javascript" src="/public/js/table.js?v1"></script>
+<style type="text/css">
+    td.error {
+        background-color: #f04124;
+        border-color: #de2d0f;
+        color: #fff;
+    }
 
-        </script>
-        <script type="text/javascript" src="/public/js/common.js?v2.10"></script>
-        <script type="text/javascript" src="/public/js/table.js?v1"></script>
-        <style type="text/css">
-        td.error {
-            background-color: #f04124;
-            border-color: #de2d0f;
-            color: #fff;
-        }
-        
-        td.success {
-            background-color: #43AC6A;
-            border-color: #3a945b;
-            color: #fff;
-        }
-        </style>
+    td.success {
+        background-color: #43AC6A;
+        border-color: #3a945b;
+        color: #fff;
+    }
+</style>
 
 
 </html>

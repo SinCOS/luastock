@@ -57,7 +57,7 @@ r:match('GET','/ddx.html',function()
 end)
 r:match("GET", '/nszl.html',function()
  local menu = get_Menu()
-  local view = template.new('view/nxzl.html')
+  local view = template.new('view/nszl.html')
   view:render(menu);
 end)
 r:match('GET','cache',function()
@@ -77,6 +77,18 @@ r:match('GET','/news',function(params)
 end)
 r:match('GET','/news/:id.html',function(params)
 
+end)
+r:match("GET",'/cache/:cpy_id',function(params)
+local _current_time = ngx.time()
+  local _current_table = os.date("*t",_current_time)
+    local db_path = format('/usr/local/openresty/nginx/lua/%02d%02d.db',_current_table['month'],_current_table['day'])
+    local db = require("lsqlite3").open(db_path)
+    vm = db:prepare('select * from cc_stock_info where cpy_id = "'..params.cpy_id ..'" order by  id asc limit 100 ');
+    local t ={}
+    for row in vm:nrows() do 
+        ngx.say(json.encode(row),'<br/>')
+    end
+     
 end)
 r:match('GET','/echarts_search',function(params)
   local args = ngx_req.get_uri_args()
