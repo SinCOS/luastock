@@ -206,6 +206,28 @@ $(function(){
 
         },
         methods: {
+            favorManger:function(){
+                layer.open({
+                    type:1,
+                    content:$("#favor_manger"),
+                    area:['320px','400px']
+                });
+            },
+            rmGroup:function(group_id){
+                var self = this;
+                layer.confirm('是否删除',function(index) {
+                    self.$http.delete('/user/group/'+group_id)
+                              .then(function(resp){
+                                 layer.msg(resp.body.message);
+                                 if(resp.body.status == 200){
+                                     self.reflushFavor();
+                                 }
+                              }).catch(function(resp){
+                                    layer.msg("操作失败");
+                              });
+                    layer.close(index);
+                });
+            },
             reflushTime:function(){
                 this.time.last_one = getTime(1);
                 this.time.last_two = getTime(2);

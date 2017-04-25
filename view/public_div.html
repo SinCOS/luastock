@@ -5,12 +5,21 @@
         </template>
     </ul>
 </div>
+{-raw-}
+<div id="favor_manger" style="display:none;">
+      <ul class="list-group" id='favorul' style="padding:10px;">
+        <template v-for="(item,index) in userFavor">
+            <li class="list-group-item"  :class="{'active':favorIndex == item.id  }" > {{item.name}}  <button type="button" class="close" aria-label="Close" @click="rmGroup(item.id)"><span aria-hidden="true">&times;</span></button></li>
+        </template>
+    </ul>
+</div>
+{-raw-}
 <div class="login-from" id='login_frm' style="display: none;">
     <form class="layui-form" style="padding: 20px;">
         <div class="layui-form-item ">
             <label class="layui-form-label ">用户名</label>
             <div class="layui-input-block">
-                <input type="text" name="username" required lay-verify="username " placeholder="请输入用户名" autocomplete="off" class="layui-input">
+                <input type="text" name="username" required lay-verify="username" placeholder="请输入用户名" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item ">

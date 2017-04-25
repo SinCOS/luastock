@@ -12,13 +12,14 @@ local len = string.len
 local ngx_req = ngx.req
 local ndk_set = ndk.set_var
 local md5 = ndk_set.set_md5
+local debug = false
 ngx_req.read_body()
 ngx_header.content_type = 'text/html'
 local redis
 
 local function json_suc(err,err_code,arr)
   ngx_header.content_type = "application/json"
-  ngx.status = 200
+  ngx.status = err_code
   ngx.say(json.encode({['status'] = err_code, ['message'] = err,['result'] = arr}))
 end
 local function json_error(err,err_code)
@@ -210,7 +211,28 @@ r:match('POST','/user/category',function()
     redis:set('usr:'..user_id ..':stockGroup',json.encode(res))
 
 end)
+local function update_stockGroup(user_id,delete)
+    open_mysql()
+    local del = delete or false
+    local _key = 'usr:'..user_id ..':stockGroup'
+    local re, err 
+    if del then
+       re, err =  db:query(format('update cc_stockGroup set status = 0  where uid = %d and id = %d ',user_id,del))
+       if not re or re.affected_rows == 0 then
+            return false,err
+       end 
+     
+    end
 
+    local sql = format("select id,name from cc_stockGroup where uid = %d  and status > 0 ",user_id)
+    re, err = db:query(sql)
+    res = json.encode(re)
+   
+    local ok, err = redis:set(_key,res)
+
+    redis:expire(_key,ngx.time()+3600*24*3)
+    return res 
+end
 r:match('GET','/user/category',function()
     -- local args = ngx.get_post_args()
     -- if not args or nil == args['name'] then
@@ -231,12 +253,7 @@ r:match('GET','/user/category',function()
     local _key = 'usr:'..user_id ..':stockGroup'
     local res, err = redis:get(_key)
     if not res then
-        open_mysql()
-        local sql = format("select id,name from cc_stockGroup where uid = %s  and status > 0 ",user_id)
-        re, err = db:query(sql)
-        res = json.encode(re)
-        redis:set(_key,res)
-        redis:expire(_key,ngx.time()+3600*24*3)
+        res = update_stockGroup(user_id)
     end
     json_suc('success',200,res or '')
 end)
@@ -246,6 +263,16 @@ r:match('PUT','/user/group/rename/:sg_id',function(params)
     local name = args['name'] or ''
     local ok , err = validation.string.trim.len(2)
     ngx.say(ok,err)
+end)
+r:match('DELETE','/user/group/:sg_id',function(params)
+    local sg_id = tonumber(params.sg_id);
+    local user_id = auth_check()
+    local res, err = update_stockGroup(user_id,sg_id)
+    if not res then 
+        json_error('操作失败',500,debug and res or nil)
+        return true
+    end    
+    json_suc('删除成功',200)
 end)
 r:match('DELETE','/user/favor/:sg_id/:cpy_id',function(params)
     local sg_id = tonumber(params.sg_id)
@@ -259,7 +286,7 @@ r:match('DELETE','/user/favor/:sg_id/:cpy_id',function(params)
         local sql = format("update cc_user_stock set status = 0 where sg_id = %d and cpy_id = %s and uid = %d ;",sg_id,cpy_id,user_id)
         db:query(sql)
     else
-        json_error("操作失败",400)
+        json_error("操作失败",500)
     end
     return true
     --update_stock_cache(sg_id)
@@ -269,7 +296,7 @@ r:match('POST','/user/favor/:cpy_id',function(params)
     local sg_id = tonumber(args['sg_id'] or 0)
     local user_id = auth_check()
     if sg_id <= 0 then
-       json_error('参数错误',400)
+       json_error('参数错误',500)
        ngx.exit(200)
     end
    local ok , err = redis:sadd(format('us:%d',sg_id),params.cpy_id)
@@ -282,7 +309,7 @@ r:match('POST','/user/favor/:cpy_id',function(params)
         sql = format("insert into cc_user_stock(uid,cpy_id,created_at,sg_id) values(%d,%s,localtime(),%d);",user_id,ndk_set.set_quote_sql_str(params.cpy_id),sg_id)
         res, err, errno, sqlstate = db:query(sql)
     else
-        json_error("添加失败",400)
+        json_error("添加失败",500)
     end
     -- local sql = format("select id from cc_user_stock where sg_id = %d and cpy_id = %s and uid = %d and status =1 limit 1;",sg_id,ndk_set.set_quote_sql_str(tostring(params.cpy_id)),user_id)
     -- open_mysql()
@@ -315,10 +342,9 @@ local ok, errmsg = r:execute(
         ngx_req.get_post_args()
 )         -- into a single "params" table
       if ok then
-          ngx.status = 200
           close_mysql()
       else
-          ngx.status = 200
+          ngx.status = 500
           ngx.say(errmsg)
           ngx.log(ngx.ERR, errmsg)
       end
