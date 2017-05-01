@@ -9,22 +9,24 @@ local redis = require("redis_db").new()
 local json = require('rapidjson')
 local ngx_req= ngx.req
 template.caching(false)
-
+ngx.header.content_type = 'text/html; charset=utf-8'
 ngx_req.read_body()
 local r = route.new()
 local stock_cache = ngx.shared.stock_cache
 
-ngx.header.content_type = 'text/html; charset=utf-8'
 
 local function get_Menu()
   redis:select(2)
-  local _cache = redis:get('publicGroup')
-  local public 
-  if not _cache then 
-      public = {}
+  local _cache = redis:mget('publicGroup','vipGroup')
+  local public , vip
+  if _cache then
+    public = ( type(_cache[1]) == 'userdata'  ) and {} or json.decode(_cache[1])
+    vip = ( type(_cache[2]) == 'userdata'  ) and {} or json.decode(_cache[2])
   else
-      public = json.decode(_cache)
+    public = {}
+    vip = {}
   end
+
   return {
       title = "主力动向观测站",
       leftNav = true,
@@ -35,13 +37,17 @@ local function get_Menu()
           {key = "逆势主力资金流",url = "nszl.html"}
         }
       },
-      publicGroup = public  
+      Groups = {
+          ['public'] = public,
+          ['vip'] = vip
+      }  
   }
 end
 r:match('GET','/',function()
    local menu = get_Menu()
    local view = template.new('view/index.html')
-   view:render(menu);
+   view:render(menu)
+   return true
 end);
 
 r:match('GET','/echarts',function()
@@ -155,8 +161,18 @@ r:match('GET','/echarts_search',function(params)
   redis:set(md5_key,res)
   redis:expire(md5_key,_current_time+3600*3)
 end)
-
-function main()
+r:match('GET','/groups',function(params)
+  redis:select(2)
+  local res = redis:mget('publicGroup','vipGroup')
+  local groups =  {
+    publicGroup = json.decode(res[1]),
+    vipGroup = (type(res[2]) == 'userdata') and {} or json.decode(res[2])
+  }
+ 
+  ngx.say(json.encode(groups))
+end)
+  ngx.status = ngx.HTTP_OK
+local function main()
   local ok, errmsg = r:execute(
         ngx.var.request_method,
         ngx.var.uri,
@@ -164,10 +180,8 @@ function main()
         ngx_req.get_post_args()
 )         -- into a single "params" table
 
-      if ok then
-          ngx.status = 200
-      else
-          ngx.status = 200
+      if not ok then
+          ngx.status = ngx.HTTP_OK
           ngx.say(errmsg)
           ngx.log(ngx.ERR, errmsg)
       end
@@ -175,6 +189,7 @@ function main()
       if redis then
         redis:select(0)
       end
+      
 end
 
 local ok, err = pcall(main)

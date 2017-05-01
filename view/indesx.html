@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{title}}</title>
     <link rel="shortcut icon" href="../favicon.ico">
-    <link rel="stylesheet" href="../public/layui/css/layui.css" />
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css">
-
+    <link rel="stylesheet" href="/public/layui/css/layui.css" media="all">
+    <script src="../public/jq.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/bs-3.3.5/jq-2.1.4,dt-1.10.8/datatables.min.css">
+    
 </head>
 
 <style type="text/css">
@@ -58,18 +58,18 @@
                         <th></th>
                     </tr>
                     <tr>
-                        <th style="width: 50px;">排名</th>
-                        <th style="width: 70px;">股票代码</th>
-                        <th style="width: 70px;">股票名称</th>
-                        <th style="width: 70px;" id="tab1">流入占比</th>
-                        <th style="width: 70px;" id="tab2">总净流入</th>
-                        <th style="width: 70px;" id="tab3">净流入</th>
-                        <th style="width: 70px;">净流入</th>
-                        <th style="width: 70px;">净流入</th>
-                        <th style="width: 70px;" id="tab4">净流入</th>
-                        <th style="width: 20px;">涨幅</th>
-                        <th style="width: 20px;">涨速</th>
-                        <th style="width: 30px;">操作</th>
+                        <th style="width: 20px;">排名</th>
+                        <th style="width: 100px;">股票代码</th>
+                        <th style="width: 100px;">股票名称</th>
+                        <th style="width: 130px;" id="tab1">流入占比 %</th>
+                        <th style="width: 130px;" id="tab2">总净流入</th>
+                        <th style="width: 130px;" id="tab3">净流入</th>
+                        <th style="width: 130px;">净流入</th>
+                        <th style="width: 130px;">净流入</th>
+                        <th style="width: 130px;" id="tab4">净流入</th>
+                        <th style="width: 60px;">涨幅</th>
+                        <th style="width: 60px;">涨速</th>
+                        <th>操作</th>
                     </tr>
                 </thead>
             </table>
@@ -84,7 +84,7 @@
 </body>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/vue.resource/1.2.1/vue-resource.min.js"></script>
-<script src="../public/layui/layui.js" charset="utf-8"></script>
+<script src="/public/layui/layui.js" charset="utf-8"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js"></script>
 <script type="text/javascript">
 var stock_url = '/api/stock/jlr';
@@ -121,8 +121,8 @@ var table_info = {
 };
 console.log(table_info.stock_url);
 </script>
-<script type="text/javascript" src="../public/js/common.js?v2.10"></script>
-<script type="text/javascript" src="../public/js/table.js?v1"></script>
+<script type="text/javascript" src="/public/js/common.js?v2.10"></script>
+<script type="text/javascript" src="/public/js/table.js?v1"></script>
 <style type="text/css">
 td.error {
     background-color: #f04124;
@@ -131,7 +131,7 @@ td.error {
 }
 
 td.success {
-    background-color: #56A73D;
+    background-color: #43AC6A;
     border-color: #3a945b;
     color: #fff;
 }

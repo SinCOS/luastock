@@ -54,7 +54,7 @@ $(function () {
             console.log(table_info.stock_url);
             $.ajax({
                     url: table_info.stock_url,
-                    type: 'POST',
+                    type: 'GET',
                     dataType: 'json',
                     data: jsk(aoData),
                 })
@@ -147,12 +147,15 @@ $(function () {
                     }
                 });
                 return false;
-            }).attr('cpy_name', aData['name']).text(app.$data.favorClickIndex ? '取消关注' : '关注');
+            }).attr('cpy_name', aData['name']).html(app.$data.favorClickIndex ? '<a href="javascipt:void;">取消关注</a>' : '<a href="javascipt:void;">关注</a>').css({
+                "cursor":'pointer'});;
             if (parseFloat(aData['zf']) > 0) {
-                
-                     $('td:eq(9)', nRow).addClass('error');
-                
-               
+                $('td:eq(9)', nRow).addClass('error');
+                aData['zf'] = '+' + aData['zf'];
+                $('td:eq(9)',nRow).text(aData['zf'])
+                console.log(aData['zf']);
+            }else if(parseFloat(aData['zf']) < 0 ){
+                $('td:eq(9)',nRow).addClass('success');
             }
             return nRow;
         }

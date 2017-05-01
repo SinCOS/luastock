@@ -35,15 +35,21 @@
         <div class="layui-side layui-bg-black">
             <div class="layui-side-scroll">
                 <ul class="layui-nav layui-nav-tree" lay-filter="demo">
-                    <li class="layui-nav-item layui-nav-itemed">
-                        <a href="javascript:;">自选股</a>
+                     <li class="layui-nav-item layui-nav-itemed">
+                        <a href="javascript:;">公共模块</a>
                         <dl class="layui-nav-child">
-                            <dd  class="layui-this"><a href="javascript:;" @click="favor_click(0,0)">默认</a></dd>
-                            {% for k,v in ipairs(publicGroup) do %}
+                             <dd  class="layui-this"><a href="javascript:;" @click="favor_click(0,0)">默认</a></dd>
+                            {% for k,v in ipairs(Groups.public) do %}
                             <dd> 
                                 <a href="javascript:;" v-bind:data="{{v.id}}" @click="favor_click({{v.id}},0);" > {{v.name}} </a>
                             </dd>
                             {% end %}
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item ">
+                        <a href="javascript:;">自选股</a>
+                        <dl class="layui-nav-child">
+                           
                             <template v-for="item in userFavor">
                             {-raw-}
                                 <dd>
@@ -53,15 +59,21 @@
                             </template>
                         </dl>
                     </li>
-                  <!--   <li class="layui-nav-item">
-                        <a href="javascript:;">解决方案</a>
+                    <li class="layui-nav-item ">
+                        <a href="javascript:;">VIP股票池</a>
                         <dl class="layui-nav-child">
-                            <dd><a href="">移动模块</a></dd>
-                            <dd><a href="">后台模版</a></dd>
-                            <dd><a href="">电商平台</a></dd>
+                           
+                            {% for k,v in ipairs(Groups.vip) do %}
+                           
+                                <dd>
+                                    <a href="javascript:;"  v-bind:data="{{v.name}}" @click="favor_click({{v.id}},1)"> {{v.name}}</a> 
+                                </dd>
+                            
+                            {% end %}
                         </dl>
                     </li>
-                    <li class="layui-nav-item"><a href="">云市场</a></li>
+                 
+                    <!--<li class="layui-nav-item"><a href="">云市场</a></li>
                     <li class="layui-nav-item"><a href="">社区</a></li> -->
                 </ul>
             </div>

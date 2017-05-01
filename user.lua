@@ -16,7 +16,7 @@ local debug = false
 ngx_req.read_body()
 ngx_header.content_type = 'text/html'
 local redis
-
+local  expires_time = 72 * 3600 
 local function json_suc(err,err_code,arr)
   ngx_header.content_type = "application/json"
   ngx.status = err_code
@@ -90,21 +90,29 @@ local function login(username,password)
       json_error('登陆失败',400)
       return 
   end
-  sql = format("update cc_user set total_login = total_login + 1 ,login_IP = '%s' , login_time = localtime() ",ip)
+  local user_id = res[1]['id']
+  sql = format("update cc_user set total_login = total_login + 1 ,login_IP = '%s' , login_time = localtime()  where id = %d ",ip,user_id)
   db:query(sql)
-  local token = md5(ip .. res[1]['id'])
+  local token = md5(ip .. user_id)
   local redis = require('redis_db').new()
   redis:select(2)
   local login_key = format('login:%s',token)
   local token_info = format('token:%s',token)
+  local current_time = ngx.time()
   redis:init_pipeline()
-  redis:set(format('login:%s',token),res[1]['id'])
-  redis:expire(login_key,ngx.time()+3*3600*24)
+  redis:set(format('login:%s',token),user_id)
+  redis:expire(login_key,current_time+expires_time)
   redis:set(token_info,json.encode(res[1]))
-  redis:expire(token_info,ngx.time()+3*3600*24)
+  redis:expire(token_info,current_time+expires_time)
   redis:commit_pipeline()
   redis:select(0)
-  json_suc('登录成功',200,{['token'] = token,['userID'] = res[1]['id']})
+  local cookie = require('resty.cookie'):new()
+  cookie:set({
+      key = 'Authorization', value = token,
+      path = '/',
+      expires = ngx.cookie_time(current_time+ expires_time)
+  })
+  json_suc('登录成功',200,{['token'] = token,['userID'] = user_id})
 end
 local function register(username,password,mobile)
     open_mysql()
@@ -278,7 +286,7 @@ r:match('DELETE','/user/favor/:sg_id/:cpy_id',function(params)
     local sg_id = tonumber(params.sg_id)
     local cpy_id = params.cpy_id
     local user_id = auth_check()
-    local res, err = redis:srem(format('us:%d',sg_id),cpy_id)
+    local res, err = redis:srem(format('usr:%d:us:%d',user_id,sg_id),cpy_id)
     if res and tonumber(res) > 0 then
         json_suc("删除成功" ,200)
         ngx.eof()
@@ -299,7 +307,7 @@ r:match('POST','/user/favor/:cpy_id',function(params)
        json_error('参数错误',500)
        ngx.exit(200)
     end
-   local ok , err = redis:sadd(format('us:%d',sg_id),params.cpy_id)
+   local ok , err = redis:sadd(format('usr:%d:us:%d',user_id,sg_id),params.cpy_id)
 
 
    if tonumber(ok) > 0 then
