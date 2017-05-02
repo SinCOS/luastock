@@ -12,7 +12,6 @@ template.caching(false)
 ngx.header.content_type = 'text/html; charset=utf-8'
 ngx_req.read_body()
 local r = route.new()
-local stock_cache = ngx.shared.stock_cache
 
 
 local function get_Menu()

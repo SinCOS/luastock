@@ -64,9 +64,9 @@
                         <dl class="layui-nav-child">
                            
                             {% for k,v in ipairs(Groups.vip) do %}
-                           
+            
                                 <dd>
-                                    <a href="javascript:;"  v-bind:data="{{v.name}}" @click="favor_click({{v.id}},1)"> {{v.name}}</a> 
+                                    <a href="javascript:;"  v-bind:data="{{v.id}}" @click="favor_click({{v.id}},1)"> {{v.name}}</a> 
                                 </dd>
                             
                             {% end %}

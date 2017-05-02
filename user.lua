@@ -13,6 +13,7 @@ local ngx_req = ngx.req
 local ndk_set = ndk.set_var
 local md5 = ndk_set.set_md5
 local debug = false
+local sql_str = ndk_set.set_quote_sql_str
 ngx_req.read_body()
 ngx_header.content_type = 'text/html'
 local redis
@@ -114,17 +115,27 @@ local function login(username,password)
   })
   json_suc('登录成功',200,{['token'] = token,['userID'] = user_id})
 end
-local function register(username,password,mobile)
+local function register(username,password,email,mobile)
     open_mysql()
-    local res,err = db:query(format('select id from cc_user where username = %s limit 1;',username))
-    if not res or #res > 0 then
-      json_error('用户已存在',400)
+    local user = sql_str(username)
+    local em = sql_str(email)
+    local res,err = db:query(format('select username from cc_user where username = %s  or email = %s limit 1;',user,em))
+    if not res  then
+         json_error('系统错误，请联系管理员',400)
+      return true
+    elseif #res > 0 then
+       if res[1]['username'] == username then
+         err = '用户已存在'
+      else
+        err = '电子邮箱已被注册'
+      end
+      json_error(err,400)
       return true
     end
-    local sql = format("insert into cc_user(username,password,mobile,reg_time) values(%s,'%s',%s,localtime())",username,password,mobile or "''")
+    local sql = format("insert into cc_user(username,email,password,mobile,reg_time) values(%s,%s,'%s',%s,localtime())",user,em,password,mobile or "''")
     local res, err = db:query(sql)
     if not res then
-      json_error("注册失败",400)
+      json_error(err,400)
       return false
     end
     json_suc('注册成功',200)
@@ -168,26 +179,35 @@ r:match('POST','/user/login',function(params)
     return login(username,ngx.md5(pass))
 
 end);
+local verify = {
+    nick = validation.string.trim:minlen(4),
+    email = validation.string.trim.email,
+    password = validation.string.trim:minlen(6)
+}
 r:match('POST','/user/register',function()
     local err =''
     local err_code = 200
     --local args = ngx_req.get_uri_args()
     local args =  ngx_req.get_post_args()
-    local username = args['username'] or ''
-    local pass = args['password'] or ''
-     if len(username)  < 3 then
-        err = '用户名长度不够'
+    local vu,username = verify.nick(args['username'] or '')
+    local vp,pass = verify.password(args['password'] or '')
+    local ve,email =  verify.email(args['email'] or '')
+     if  not vu then
+       err_code = 400
+       err = '请输入正确的用户名'
+    elseif not vp  then
+        err_code  = 400
+        err = '密码长度不能小于6个字符'
+    elseif not ve then
         err_code = 400
-    elseif len(pass) < 6 then
-        err ='密码长度不够'
-        err_code = 400
+        err = '电子邮箱格式不对'
     end
     if err_code ~=  200 then
          json_error(err,err_code)
          return true
     end
     local password = md5(pass)
-    register(ndk_set.set_quote_sql_str(username),password)
+    register(username,password,email)
     return true
 
 end)
