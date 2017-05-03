@@ -135,7 +135,7 @@ $(function () {
         }
         if (h >= 15) {
             if (i > 0) {
-                return "15:" + (60 - i);
+                return "14:" + (60 - i);
             }
             return "15:00";
         }
@@ -265,6 +265,10 @@ $(function () {
                 this.favorIndex = id;
             },
             vip_click: function(id){
+                if(!this.loginIn){
+                    login();
+                    return false;
+                }
                 table_info.stock_url = stock_url + "/" + id + "/vip";
                 table_info.current.ajax.reload();
             },
