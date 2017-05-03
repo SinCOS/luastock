@@ -170,7 +170,17 @@ r:match('GET','/groups',function(params)
  
   ngx.say(json.encode(groups))
 end)
+r:match('GET','/vip',function(params)
+  local menu = get_Menu()
+  redis:select(0)
+  local cache = redis:get('last_news')
+  menu.news = json.decode(cache)
+  menu.leftNav = false
+  local view = template.new('view/news.html')
+   view:render(menu)
+end)
   ngx.status = ngx.HTTP_OK
+
 local function main()
   local ok, errmsg = r:execute(
         ngx.var.request_method,

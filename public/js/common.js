@@ -264,6 +264,10 @@ $(function () {
             favor_select: function (id) {
                 this.favorIndex = id;
             },
+            vip_click: function(id){
+                table_info.stock_url = stock_url + "/" + id + "/vip";
+                table_info.current.ajax.reload();
+            },
             favor_click: function (id, _public) {
                 var _private = _public || 0
                 if (id == 0 && _private == 0) {

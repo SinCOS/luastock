@@ -61,9 +61,14 @@ $(function () {
                 .done(function (resp) {
                     fnCallback(resp);
                 })
-                .fail(function () {
-
-                    layer.msg('获取数据失败');
+                .fail(function (resp) {
+                    var json = resp.responseJSON;
+                    if (json.status == 404) {
+                        login();
+                    }else if(json.status == 403){
+                        layer.msg(json.message);
+                    }
+                    
                 })
                 .always(function () {
                     console.log("complete");
@@ -97,6 +102,10 @@ $(function () {
                     });
 
                     return false;
+                }
+                if(!app.$data.login){
+                     login();
+                     return false;
                 }
                 var layer_index = layer.open({
                     type: 1,

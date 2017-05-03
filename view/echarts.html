@@ -10,7 +10,7 @@
     <link rel="shortcut icon" href="../favicon.ico">
 
     <link rel="stylesheet" href="/public/layui/css/layui.css" media="all">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+       <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
     <link href="https://cdn.bootcss.com/ion-rangeslider/2.1.7/css/ion.rangeSlider.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.bootcss.com/ion-rangeslider/2.1.7/css/ion.rangeSlider.skinFlat.css" />
 </head>
@@ -40,6 +40,7 @@
         {(view/menu.html)}
         <div class="layui-body tb_body" style="overflow-y:scroll;">
             <vue-echarts></vue-echarts>
+            <input type="text" class="layui-input"  id='choose_time'>
             <vue-search-echarts></vue-search-echarts>
           <!--   <div is='vue-echarts'></div>
             <div is='vue-search-echarts'></div> -->
@@ -101,11 +102,29 @@
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/vue.resource/1.2.1/vue-resource.min.js"></script>
 <script src="/public/layui/layui.js" charset="utf-8"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+<script src='/public/layui/lay/modules/laydate.js'></script>
+<script type="text/javascript" src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js"></script>
+<!--<script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>-->
 <script type="text/javascript" src="https://cdn.bootcss.com/ion-rangeslider/2.1.7/js/ion.rangeSlider.min.js"></script>
 <script type="text/javascript" src="/public/js/timeline.js"></script>
 <script type="text/javascript" src="//cdn.bootcss.com/echarts/3.4.0/echarts.min.js"></script>
-
+<script>
+    $(function(){
+    var start = {
+    min: laydate.now()
+    ,max: '2099-06-16 23:59:59'
+    ,istoday: false
+    ,choose: function(datas){
+     console.log(datas);
+    }
+  };
+        $('#choose_time').click(function(){
+            alert('ddd');
+            start.elem = this;
+            layui.laydate(start);
+        });
+    });
+</script>
 <script type="text/javascript">
     var qx_k = 0;
     var range_max = timeLine.indexOf('15:00');
