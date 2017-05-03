@@ -118,7 +118,7 @@ r:match('GET','/echarts_search',function(params)
   local _current_time = ngx.time()
   local _current_table = os.date("*t",_current_time)
   --local db_path = format('/usr/local/openresty/nginx/lua/%02d%02d.db',4,19)
-  local db_path = format('/usr/local/openresty/nginx/lua/%02d%02d.db',_current_table['month'],_current_table['day'])
+  local db_path = format('/data/wwwroot/sysctrl/db/%02d%02d.db',_current_table['month'],_current_table['day'])
   local db = require("lsqlite3").open(db_path)
   if not db then 
     ngx.say('db nil ',db_path) 
