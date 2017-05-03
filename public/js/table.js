@@ -103,7 +103,7 @@ $(function () {
 
                     return false;
                 }
-                if(!app.$data.login){
+                if(!app.$data.loginIn){
                      login();
                      return false;
                 }

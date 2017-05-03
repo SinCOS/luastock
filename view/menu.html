@@ -5,9 +5,11 @@
                     <li class="layui-nav-item">
                         <a href="javascript:;">数据中心</a>
                         <dl class="layui-nav-child">
-                            {% for _,v in ipairs(url.list) do %}
-                            <dd><a href="{{v.url}}">{{v.key}}</a></dd>
-                            {% end %}
+                           
+                            <dd><a href="/">主力资金流入</a></dd>
+                            <dd><a href="/ddx.html">分时DDX(主力强度)</a></dd>
+                            <dd><a href="/nxsl.html">逆势主力资金流</a></dd>
+                            
                         </dl>
                     </li>
                     <li class="layui-nav-item"><a href="/news" _target="_blank">新闻中心</a></li>

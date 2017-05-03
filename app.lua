@@ -48,7 +48,12 @@ r:match('GET','/',function()
    view:render(menu)
    return true
 end);
-
+r:match('GET','/zlzj.html',function()
+   local menu = get_Menu()
+   local view = template.new('view/zlzj.html')
+   view:render(menu)
+   return true
+end)
 r:match('GET','/echarts',function()
   local menu = get_Menu()
   menu.leftNav = false
