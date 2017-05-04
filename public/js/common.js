@@ -1,6 +1,6 @@
 $(function () {
-
-
+    var tabIndex = 0;
+    var element = null;
     login = function () {
         destoryStorage();
         layer.open({
@@ -59,7 +59,7 @@ $(function () {
 
     }
     layui.use(['element', 'form'], function () {
-        var element = layui.element();
+        element = layui.element();
         var form = layui.form();
         form.verify({
             username: function (value) {
@@ -106,7 +106,10 @@ $(function () {
 
             return false;
         });
-
+        element.on('tab(sysctrl)', function (data) {
+            app.$data.tabIndex = data.index;
+            console.log(JSON.stringify(data));
+        });
     });
 
     function check_time(m) {
@@ -152,99 +155,35 @@ $(function () {
         }
         return h + ":" + check_time(m - i);
     }
-    Vue.component('jlrdatables', {
+    Vue.component('datatables', {
         template: "#datables",
-           props:['parent_url'],
+        props: ['parent_url', 'data', 'tabindex'],
         data: function () {
-            return {
-                id: "jlr",
-                time: {
-                    last_one: '',
-                    last_two: '',
-                    last_three: '',
-                },
-                stock_url: '/api/stock/jlr',
-                table: {
+            if (this.data == 'jlr') {
+                return {
+                    id: "jlr",
+                    time: {
+                        last_one: '',
+                        last_two: '',
+                        last_three: '',
+                    },
                     stock_url: '/api/stock/jlr',
-                    columns: [{
-                        "data": null,
-                        'orderable': false
-                    }, {
-                        "data": "cpy_id"
-                    }, {
-                        "data": "name"
-                    }, {
-                        "data": "zlbfb"
-                    }, {
-                        "data": "jlr"
-                    }, {
-                        "data": "calc"
-                    }, {
-                        "data": "one"
-                    }, {
-                        "data": "two"
-                    }, {
-                        "data": "three"
-                    }, {
-                        "data": "zf"
-                    }, {
-                        "data": "zs"
-                    }, {
-                        "data": null,
-                        'orderable': false
-                    }],
-                    current: null
-                }
-            };
-        },
-        mounted: function () {
-            this.time.last_one = getTime(1);
-            this.time.last_two = getTime(2);
-            this.time.last_three = getTime(3);
-            this.table.current = $('#jlr').DataTable(build_datables(this.table));
-        },
-        methods: {
-
-        },
-        watch:{
-            parent_url:function(){
-                this.table.stock_url = this.stock_url + this.parent_url;
-                this.table.current.ajax.reload();
-            }
-        }
-    });
-    Vue.component('ddxdatatables', {
-        template: "#ddxtemplate",
-           props:['parent_url'],
-        data: function () {
-            return {
-                id: "ddx",
-                time: {
-                    last_one: '',
-                    last_two: '',
-                    last_three: '',
-                },
-                stock_url: '/api/stock/ddx',
-                table: {
-                    stock_url: '/api/stock/ddx',
-                    columns: [{
+                    table: {
+                        stock_url: '/api/stock/jlr',
+                        columns: [{
                             "data": null,
                             'orderable': false
                         }, {
                             "data": "cpy_id"
                         }, {
                             "data": "name"
-                        },
-                        {
-                            'data': 'zlbfb'
-                        },
-                        {
-                            "data": 'zljb'
-                        },
-                        {
-                            'data': 'lst_ddxCache'
-                        },
-                        {
+                        }, {
+                            "data": "zlbfb"
+                        }, {
+                            "data": "jlr"
+                        }, {
+                            "data": "calc"
+                        }, {
                             "data": "one"
                         }, {
                             "data": "two"
@@ -255,91 +194,144 @@ $(function () {
                         }, {
                             "data": "zs"
                         }, {
+                            "data": null,
+                            'orderable': false
+                        }],
+                        current: null
+                    }
+                };
+            } else if (this.data == 'ddx') {
+                return {
+                    id: "ddx",
+                    time: {
+                        last_one: '',
+                        last_two: '',
+                        last_three: '',
+                    },
+                    stock_url: '/api/stock/ddx',
+                    table: {
+                        stock_url: '/api/stock/ddx',
+                        columns: [{
+                                "data": null,
+                                'orderable': false
+                            }, {
+                                "data": "cpy_id"
+                            }, {
+                                "data": "name"
+                            },
+                            {
+                                'data': 'zlbfb'
+                            },
+                            {
+                                "data": 'zljb'
+                            },
+                            {
+                                'data': 'lst_ddxCache'
+                            },
+                            {
+                                "data": "one"
+                            }, {
+                                "data": "two"
+                            }, {
+                                "data": "three"
+                            }, {
+                                "data": "zf"
+                            }, {
+                                "data": "zs"
+                            }, {
+                                'data': null,
+                                'orderable': false
+                            }
+                        ],
+                        current: null
+                    }
+                };
+            } else {
+                return {
+                    id: "nszl",
+                    time: {
+                        last_one: '',
+                        last_two: '',
+                        last_three: '',
+                    },
+                    stock_url: '/api/stock/nszl',
+                    table: {
+                        stock_url: '/api/stock/nszl',
+                        columns: [{
+                            "data": null,
+                            'orderable': false
+                        }, {
+                            "data": "cpy_id"
+                        }, {
+                            "data": "name"
+                        }, {
+                            "data": 'nxjlrjh'
+                        }, {
+                            "data": "nxjlrch"
+                        }, {
+                            "data": "nxjlr"
+                        }, {
+                            "data": "jhcs"
+                        }, {
+                            "data": "chcs"
+                        }, {
+                            "data": "jcc"
+                        }, {
+                            "data": "zf"
+                        }, {
+                            "data": "zs"
+                        }, {
                             'data': null,
                             'orderable': false
-                        }
-                    ],
-                    current: null
-                }
-            };
+                        }],
+                        current: null
+                    }
+                };
+            }
         },
         mounted: function () {
             this.time.last_one = getTime(1);
             this.time.last_two = getTime(2);
             this.time.last_three = getTime(3);
-            this.table.current = $('#' + this.id).DataTable(build_datables(this.table));
-        },
-        methods: {
+            if (this.tabindex == 0 && this.data == 'jlr') {
+                this.handle();
+            }
 
         },
-        watch:{
-            parent_url:function(){
-                this.table.stock_url = this.stock_url + this.parent_url;
-                this.table.current.ajax.reload();
-            }
-        }
-    });
-    Vue.component('nszldatatables', {
-        template: "#nszltemplate",
-        props:['parent_url'],
-        data: function () {
-            return {
-                id: "nszl",
-                time: {
-                    last_one: '',
-                    last_two: '',
-                    last_three: '',
-                },
-                stock_url: '/api/stock/nszl',
-                table: {
-                    stock_url: '/api/stock/nszl',
-                    columns: [{
-                        "data": null,
-                        'orderable': false
-                    }, {
-                        "data": "cpy_id"
-                    }, {
-                        "data": "name"
-                    }, {
-                        "data": 'nxjlrjh'
-                    }, {
-                        "data": "nxjlrch"
-                    }, {
-                        "data": "nxjlr"
-                    }, {
-                        "data": "jhcs"
-                    }, {
-                        "data": "chcs"
-                    }, {
-                        "data": "jcc"
-                    }, {
-                        "data": "zf"
-                    }, {
-                        "data": "zs"
-                    }, {
-                        'data': null,
-                        'orderable': false
-                    }],
-                    current: null
+        methods: {
+            handle: function () {
+                console.log(this.table.current);
+                if (typeof this.table.current === undefined || this.table.current == null) {
+                    console.log('初始化');
+                    this.table.current = $('#' + this.id).DataTable(build_datables(this.table));
+                    return true;
                 }
-            };
+                return false;
+            }
         },
-        mounted: function () {
-            this.time.last_one = getTime(1);
-            this.time.last_two = getTime(2);
-            this.time.last_three = getTime(3);
-            this.table.current = $('#' + this.id).DataTable(build_datables(this.table));
-        },
-        methods: {
-
-        },
-        watch:{
-            parent_url:function(){
+        watch: {
+            parent_url: function () {
                 this.table.stock_url = this.stock_url + this.parent_url;
+                if (this.table.current == null) {
+                    return this.handle();
+                }
                 this.table.current.ajax.reload();
+            },
+            tabindex: function () {
+                if (this.tabindex == 0 && this.data == 'jlr') {
+                    this.handle()
+                } else if (this.tabindex == 1 && this.data == 'ddx') {
+                    this.handle();
+                } else if (this.tabindex == 2 && this.data == 'nszl') {
+                    this.handle();
+                }
+
+
             }
         }
     });
+
+
 
 
     Vue.http.options.emulateJSON = true;
@@ -350,10 +342,11 @@ $(function () {
             userInfo: [],
             userFavor: [],
             favorIndex: 0,
+            tabIndex: tabIndex,
             favorClickIndex: false,
             favorselectIndex: 0,
             echarts: null,
-            reflush_url:'',
+            reflush_url: '',
             time: {
                 current_time: '',
                 last_one: '',
@@ -395,6 +388,7 @@ $(function () {
                 }
 
             }, function (resp) {
+                destoryStorage();
                 self.loginIn = false;
             });
             console.log(self.loginIn);
@@ -459,7 +453,7 @@ $(function () {
                     login();
                     return false;
                 }
-                self.reflush_url = "/" + id + "/vip";
+                this.reflush_url = "/" + id + "/vip";
             },
             favor_click: function (id, _public) {
                 var _private = _public || 0
