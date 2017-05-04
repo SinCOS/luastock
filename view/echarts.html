@@ -111,14 +111,14 @@
 <script>
     $(function(){
     var start = {
-    min: laydate.now()
+    min: layui.laydate.now()
     ,max: '2099-06-16 23:59:59'
     ,istoday: false
     ,choose: function(datas){
      console.log(datas);
     }
   };
-        $('#choose_time').click(function(){
+        $('#choose_time').on('click',function(){
             alert('ddd');
             start.elem = this;
             layui.laydate(start);

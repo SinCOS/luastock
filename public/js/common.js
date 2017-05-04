@@ -152,6 +152,195 @@ $(function () {
         }
         return h + ":" + check_time(m - i);
     }
+    Vue.component('jlrdatables', {
+        template: "#datables",
+           props:['parent_url'],
+        data: function () {
+            return {
+                id: "jlr",
+                time: {
+                    last_one: '',
+                    last_two: '',
+                    last_three: '',
+                },
+                stock_url: '/api/stock/jlr',
+                table: {
+                    stock_url: '/api/stock/jlr',
+                    columns: [{
+                        "data": null,
+                        'orderable': false
+                    }, {
+                        "data": "cpy_id"
+                    }, {
+                        "data": "name"
+                    }, {
+                        "data": "zlbfb"
+                    }, {
+                        "data": "jlr"
+                    }, {
+                        "data": "calc"
+                    }, {
+                        "data": "one"
+                    }, {
+                        "data": "two"
+                    }, {
+                        "data": "three"
+                    }, {
+                        "data": "zf"
+                    }, {
+                        "data": "zs"
+                    }, {
+                        "data": null,
+                        'orderable': false
+                    }],
+                    current: null
+                }
+            };
+        },
+        mounted: function () {
+            this.time.last_one = getTime(1);
+            this.time.last_two = getTime(2);
+            this.time.last_three = getTime(3);
+            this.table.current = $('#jlr').DataTable(build_datables(this.table));
+        },
+        methods: {
+
+        },
+        watch:{
+            parent_url:function(){
+                this.table.stock_url = this.stock_url + this.parent_url;
+                this.table.current.ajax.reload();
+            }
+        }
+    });
+    Vue.component('ddxdatatables', {
+        template: "#ddxtemplate",
+           props:['parent_url'],
+        data: function () {
+            return {
+                id: "ddx",
+                time: {
+                    last_one: '',
+                    last_two: '',
+                    last_three: '',
+                },
+                stock_url: '/api/stock/ddx',
+                table: {
+                    stock_url: '/api/stock/ddx',
+                    columns: [{
+                            "data": null,
+                            'orderable': false
+                        }, {
+                            "data": "cpy_id"
+                        }, {
+                            "data": "name"
+                        },
+                        {
+                            'data': 'zlbfb'
+                        },
+                        {
+                            "data": 'zljb'
+                        },
+                        {
+                            'data': 'lst_ddxCache'
+                        },
+                        {
+                            "data": "one"
+                        }, {
+                            "data": "two"
+                        }, {
+                            "data": "three"
+                        }, {
+                            "data": "zf"
+                        }, {
+                            "data": "zs"
+                        }, {
+                            'data': null,
+                            'orderable': false
+                        }
+                    ],
+                    current: null
+                }
+            };
+        },
+        mounted: function () {
+            this.time.last_one = getTime(1);
+            this.time.last_two = getTime(2);
+            this.time.last_three = getTime(3);
+            this.table.current = $('#' + this.id).DataTable(build_datables(this.table));
+        },
+        methods: {
+
+        },
+        watch:{
+            parent_url:function(){
+                this.table.stock_url = this.stock_url + this.parent_url;
+                this.table.current.ajax.reload();
+            }
+        }
+    });
+    Vue.component('nszldatatables', {
+        template: "#nszltemplate",
+        props:['parent_url'],
+        data: function () {
+            return {
+                id: "nszl",
+                time: {
+                    last_one: '',
+                    last_two: '',
+                    last_three: '',
+                },
+                stock_url: '/api/stock/nszl',
+                table: {
+                    stock_url: '/api/stock/nszl',
+                    columns: [{
+                        "data": null,
+                        'orderable': false
+                    }, {
+                        "data": "cpy_id"
+                    }, {
+                        "data": "name"
+                    }, {
+                        "data": 'nxjlrjh'
+                    }, {
+                        "data": "nxjlrch"
+                    }, {
+                        "data": "nxjlr"
+                    }, {
+                        "data": "jhcs"
+                    }, {
+                        "data": "chcs"
+                    }, {
+                        "data": "jcc"
+                    }, {
+                        "data": "zf"
+                    }, {
+                        "data": "zs"
+                    }, {
+                        'data': null,
+                        'orderable': false
+                    }],
+                    current: null
+                }
+            };
+        },
+        mounted: function () {
+            this.time.last_one = getTime(1);
+            this.time.last_two = getTime(2);
+            this.time.last_three = getTime(3);
+            this.table.current = $('#' + this.id).DataTable(build_datables(this.table));
+        },
+        methods: {
+
+        },
+        watch:{
+            parent_url:function(){
+                this.table.stock_url = this.stock_url + this.parent_url;
+                this.table.current.ajax.reload();
+            }
+        }
+    });
+
 
     Vue.http.options.emulateJSON = true;
     app = new Vue({
@@ -164,6 +353,7 @@ $(function () {
             favorClickIndex: false,
             favorselectIndex: 0,
             echarts: null,
+            reflush_url:'',
             time: {
                 current_time: '',
                 last_one: '',
@@ -264,28 +454,25 @@ $(function () {
             favor_select: function (id) {
                 this.favorIndex = id;
             },
-            vip_click: function(id){
-                if(!this.loginIn){
+            vip_click: function (id) {
+                if (!this.loginIn) {
                     login();
                     return false;
                 }
-                table_info.stock_url = stock_url + "/" + id + "/vip";
-                table_info.current.ajax.reload();
+                self.reflush_url = "/" + id + "/vip";
             },
             favor_click: function (id, _public) {
                 var _private = _public || 0
+                var self = this;
                 if (id == 0 && _private == 0) {
-                    table_info.stock_url = stock_url;
+                    self.reflush_url = '';
                     this.favorClickIndex = false;
-                    table_info.current.ajax.reload();
                 } else if (_private == 0) {
-                    table_info.stock_url = stock_url + '/' + id + '/0';
+                    self.reflush_url = '/' + id + '/0';
                     this.favorClickIndex = false;
-                    table_info.current.ajax.reload();
                 } else {
-                    table_info.stock_url = stock_url + '/' + id;
+                    self.reflush_url = '/' + id;
                     this.favorClickIndex = true;
-                    table_info.current.ajax.reload();
                 }
                 this.favorselectIndex = id;
             },
