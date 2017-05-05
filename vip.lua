@@ -12,8 +12,19 @@ router:match('GET','/',function(params)
 end)
 
 
-router:match('POST','/vip/order',function(param)
+router:match('GET','/user/vip/order',function(param)
+ngx.say('heloo');
+    local http = require "resty.http"
+    local httpc = http.new()
+    local res, err = httpc:request_uri('http://www.baidu.com',{
+          method = "GET"
+    })
+    if not res then 
+        ngx.say('666',err)
+    end
+    ngx.say('666',err);
 
+    
 end)
 
 

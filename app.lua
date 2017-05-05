@@ -1,12 +1,12 @@
 local route = require('router')
+local template = require "resty.template"
+local redis = require("redis_db").new()
+local json = require('rapidjson')
 local format = string.format
 local len = string.len
 local byte = string.byte
 local sub = string.sub
 local tb_insert = table.insert
-local template = require "resty.template"
-local redis = require("redis_db").new()
-local json = require('rapidjson')
 local ngx_req= ngx.req
 template.caching(false)
 ngx.header.content_type = 'text/html; charset=utf-8'
@@ -184,7 +184,12 @@ r:match('GET','/vip',function(params)
   local view = template.new('view/news.html')
    view:render(menu)
 end)
-  ngx.status = ngx.HTTP_OK
+r:match('GET','/666',function(params)
+  redis:select(1)
+  ngx.say(redis:get('orderInfo'))
+  ngx.say(redis:get('ip'))
+end)
+ngx.status = ngx.HTTP_OK
 
 local function main()
   local ok, errmsg = r:execute(

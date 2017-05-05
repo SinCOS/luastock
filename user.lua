@@ -2,6 +2,7 @@ local route = require('router')
 local template = require "resty.template" 
 local json = require('rapidjson')
 local validation = require('resty.validation')
+local cookie = require('resty.cookie'):new()
 template.caching(true)
 local format = string.format
 local ngx_header  = ngx.header
@@ -15,11 +16,11 @@ local md5 = ndk_set.set_md5
 local debug = false
 local sql_str = ndk_set.set_quote_sql_str
 ngx_req.read_body()
-ngx_header.content_type = 'text/html'
+ngx_header.content_type = 'text/html; charset=utf-8'
 local redis
 local  expires_time = 72 * 3600 
 local function json_suc(err,err_code,arr)
-  ngx_header.content_type = "application/json"
+  ngx_header.content_type = "application/json; charset=utf-8"
   ngx.status = err_code
   ngx.say(json.encode({['status'] = err_code, ['message'] = err,['result'] = arr}))
 end
@@ -34,18 +35,25 @@ end
 local function auth_check()
     local headers = ngx_req.get_headers()
     local authToken = headers['Authorization'];
+    if not authToken then
+        authToken = cookie:get('Authorization')
+    end
+    if not authToken then
+        json_error('未登录',404)
+        ngx.exit(404)
+    end
     redis = require("redis_db").new()
     redis:select(2)
     local ok = redis:exists(format('token:%s',authToken))
 
     if ok ~= 1 then
-        json_error('未登录',400)
-        ngx.exit(200)
+        json_error('未登录',404)
+        ngx.exit(404)
     end
     local _str  = redis:get(format('login:%s',authToken))
     if not _str then    
-         json_error('未登录',400)
-        ngx.exit(200)
+         json_error('未登录',404)
+         ngx.exit(404)
     end
     return _str,authToken;
 end
@@ -107,7 +115,7 @@ local function login(username,password)
   redis:expire(token_info,current_time+expires_time)
   redis:commit_pipeline()
   redis:select(0)
-  local cookie = require('resty.cookie'):new()
+
   cookie:set({
       key = 'Authorization', value = token,
       path = '/',
@@ -363,6 +371,52 @@ r:match('POST','/user/favor/:cpy_id',function(params)
     -- end
     return true
 end);
+local function build_param(param)
+    local _t = {}
+    for k,v in pairs(param) do 
+            table.insert(_t,format('%s=%s',k,tostring(v)))
+    end
+    return table.concat( _t, "&")
+end
+r:match('GET','/user/vip/notify',function(param)
+        redis = require("redis_db").new()
+        redis:select(1)
+        redis:set('orderInfo',json.encode(param))
+        resis:set('ip', ngx.var.remote_addr )
+end)
+r:match('GET','/user/vip/order',function(param)
+    local month = param['month'] or (json_error('参数错误',404) or ngx.exit(404))
+    local user_id = auth_check()
+    local body = {
+        ['orderID'] = ngx.time(),
+        ['title'] = '主力追踪会员服务',
+        ['total'] = '0.01',
+        ['user_id']  = user_id,
+        ['body'] ="66666",
+        ['notify_url'] ="http://zhulizhuizong.com/user/vip/notify",
+        ['return_url'] = "http://120.24.184.121"
+    }
+    open_mysql()
+    local sql = format("insert into cc_userVip(orderID,uid,created_at,total,status) values('%s',%d,unix_timestamp(),%f,0)",body['orderID'],user_id,body['total'])
+    local ok, sqlerr =  db:query(sql)
+    if not ok or ok.affected_rows ==0 then
+        json_error('系统错误',404)
+        return true
+    end
+    local http = require('resty.http').new()
+    local res, err = http:request_uri('http://www.lxrs.net/alipay/api.php',{
+          method = "POST",
+          body = build_param(body),
+          headers = {
+                ['Content-type'] = 'application/x-www-form-urlencoded'
+          }
+    })
+    if not res then 
+        ngx.say('666',err)
+    end
+   ngx.say(res.body)
+
+end)
 local ok, errmsg = r:execute(
         ngx.var.request_method,
         ngx.var.uri,
@@ -371,6 +425,7 @@ local ok, errmsg = r:execute(
 )         -- into a single "params" table
       if ok then
           close_mysql()
+          ngx.exit(ngx.status)
       else
           ngx.status = 500
           ngx.say(errmsg)

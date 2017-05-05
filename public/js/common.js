@@ -334,7 +334,7 @@ $(function () {
 
 
 
-    Vue.http.options.emulateJSON = true;
+   // Vue.http.options.emulateJSON = true;
     app = new Vue({
         el: "#app",
         data: {
