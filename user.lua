@@ -15,6 +15,8 @@ local ndk_set = ndk.set_var
 local md5 = ndk_set.set_md5
 local debug = false
 local sql_str = ndk_set.set_quote_sql_str
+local get_method = ngx.req.get_method 
+local ngx_time = ngx.time()
 ngx_req.read_body()
 ngx_header.content_type = 'text/html; charset=utf-8'
 local redis
@@ -107,7 +109,7 @@ local function login(username,password)
   redis:select(2)
   local login_key = format('login:%s',token)
   local token_info = format('token:%s',token)
-  local current_time = ngx.time()
+  local current_time = 
   redis:init_pipeline()
   redis:set(format('login:%s',token),user_id)
   redis:expire(login_key,current_time+expires_time)
@@ -266,7 +268,7 @@ local function update_stockGroup(user_id,delete)
    
     local ok, err = redis:set(_key,res)
 
-    redis:expire(_key,ngx.time()+3600*24*3)
+    redis:expire(_key,ngx_time+3600*24*3)
     return res 
 end
 r:match('GET','/user/category',function()
@@ -378,26 +380,30 @@ local function build_param(param)
     end
     return table.concat( _t, "&")
 end
-r:match('GET','/user/vip/notify',function(param)
-        redis = require("redis_db").new()
-        redis:select(1)
-        redis:set('orderInfo',json.encode(param))
-        resis:set('ip', ngx.var.remote_addr )
-end)
+local function month_price (month)
+    if month == 1 then return 20 end
+    if month == 3 then return 55 end
+    if month == 6 then return 110 end
+    if month == 12 then return 200 end
+    json_error('参数错误',404)
+    ngx.exit(404)
+end
 r:match('GET','/user/vip/order',function(param)
-    local month = param['month'] or (json_error('参数错误',404) or ngx.exit(404))
+    local month = tonumber(param['month'] or (json_error('参数错误',404) or ngx.exit(404)))
+    local sql = format('select ')
     local user_id = auth_check()
+    local price = month_price(month)
     local body = {
-        ['orderID'] = ngx.time(),
+        ['orderID'] = ngx_time,
         ['title'] = '主力追踪会员服务',
-        ['total'] = '0.01',
+        ['total'] = price,
         ['user_id']  = user_id,
         ['body'] ="66666",
-        ['notify_url'] ="http://www.zhulizhuizong.com/user/vip/notify",
+        ['notify_url'] ="http://120.24.184.121/user/vip/order/notify",
         ['return_url'] = "http://120.24.184.121"
     }
     open_mysql()
-    local sql = format("insert into cc_userVip(orderID,uid,created_at,total,status) values('%s',%d,unix_timestamp(),%f,0)",body['orderID'],user_id,body['total'])
+    local sql = format("insert into cc_userVip(orderID,uid,created_at,total,status,month) values('%s',%d,unix_timestamp(),%f,0,%d)",body['orderID'],user_id,body['total'],month)
     local ok, sqlerr =  db:query(sql)
     if not ok or ok.affected_rows ==0 then
         json_error('系统错误',404)
