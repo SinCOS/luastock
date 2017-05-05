@@ -393,7 +393,7 @@ r:match('GET','/user/vip/order',function(param)
         ['total'] = '0.01',
         ['user_id']  = user_id,
         ['body'] ="66666",
-        ['notify_url'] ="http://zhulizhuizong.com/user/vip/notify",
+        ['notify_url'] ="http://www.zhulizhuizong.com/user/vip/notify",
         ['return_url'] = "http://120.24.184.121"
     }
     open_mysql()
