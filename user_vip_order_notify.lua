@@ -1,5 +1,6 @@
 local route = require('router')
 local json = require('rapidjson')
+local cjson =require('cjson')
 local mysql = require('resty.mysql')
 local redis = require("redis_db").new()
 local format = string.format
@@ -49,44 +50,78 @@ local function close_mysql()
   return db:set_keepalive(10000,100)
   end
 end
-r:match('POST','/user/vip/notify',function(param)
+local function vipTime(month,viptime)
+    local curTime = viptime or ngx_time
+    local timeTab = os.date("*t",curTime)
+    ngx.say(timeTab['year'],timeTab['month'],timeTab['day'])
+    if 12 - (timeTab['month'] + month) >= 0 then
+        timeTab['month'] = timeTab['month'] + month
+    else
+        timeTab['month'] = 12 - (timeTab['month'] +month)
+        timeTab['year'] = timeTab['year'] + 1
+    end 
+    return os.time(timeTab)
+end
+local function update_table(param)
 
+
+end
+r:match('POST','/user/vip/order/notify',function(param)
         ngx.status =200 
-        if get_method ~= 'POST' then 
-            ngx.say('fail')
+        if get_method() ~= 'POST'  then 
+            ngx.say('fail','get_method')
             return true
          end
+         if param['trade_status'] == 'TRADE_SUCCESS' then
         open_mysql()
         local orderID = param['out_trade_no']
-        local total = param['total_fee']
-        local sql = format("select * from cc_userVip where orderId= '%s' ",orderId);
-        local ok, err = db:query(sql)
-        if not ok or #ok == 0 then 
-            ngx.say('fail')
+        local total = tonumber(param['total_fee'])
+        local buyer_email = param['buyer_email']
+        local trade_no = param['trade_no']
+        local sql = format("select * from cc_userVip where orderId= '%s' limit 1;",orderID);
+        local user_res, err = db:query(sql)
+        if not user_res or #user_res == 0 then 
+            ngx.say('fail','cc_userVip',err,sql)
             return true
         end
-        local order = ok[1]
-
-        if tonumber(order['status']) == 0 and order['total'] == total and order['uid'] > 0  then
+        local order = user_res[1]
+        if order['status'] == 0 and order['total'] == total and order['uid'] > 0  then
             local user_sql = format("select * from cc_user where id = %d ",order['uid'])
             ok , err = db:query(user_sql)
-            
-            sql = format("update cc_userVip set status =1 ,buyer_email = '%s', trade_no ='%s',updated_at = unix_timestamp() ",order['buyer_email'],order['trade_no'])
+            if not ok or #ok == 0 then 
+                ngx.say('fail')
+                ngx.log(ngx.ERR,user_sql)
+                return true
+            end
+            local user = ok[1]  -- get user info
+            sql = format("update cc_userVip set status =1 ,buyer_email = '%s', trade_no ='%s',updated_at = unix_timestamp() where orderID ='%s' ",buyer_email,trade_no,orderID)
             ok ,err = db:query(sql)
-            
-            if not ok or ok.affected_rows == 0 then ngx.say('fail') end
-            local vipTime = ngx_time + 666
-            sql = format('update cc_user set viptime = %d where id = %d',order['uid'])
+            if not ok or ok.affected_rows == 0 then 
+                ngx.say('fail')  -- update opreaton fail 
+                ngx.log(ngx.ERR,'update cc_userVip')
+                return true
+            end
+            local curNow = ngx_time
+            if user['viptime'] > curNow  then
+                curNow = user['viptime']
+            end
+            local viptime = vipTime(tonumber(order['month']),curNow)
+            sql = format('update cc_user set viptime = %d where id = %d',viptime,order['uid'])
+            local ok, res  = db:query(sql)
+            if not ok or ok.affected_rows == 0 then 
+                ngx.say('fail') 
+                return true
+            end 
+            ngx.say('success')
+            return true
         end
-
-        
-        redis:select(1)
-        redis:set('orderInfo',json.encode(param))
-        resis:set('ip', ngx.var.remote_addr )
-        ngx.say('success')
+        ngx.say('fail')
+        return true
+        end
+          ngx.say('fail')
 end)
 
-
+local function main()
 local ok, errmsg = r:execute(
         ngx.var.request_method,
         ngx.var.uri,
@@ -101,3 +136,8 @@ local ok, errmsg = r:execute(
           ngx.say(errmsg)
           ngx.log(ngx.ERR, errmsg)
       end
+end
+
+local ok, err  = pcall(main)
+
+if not ok then ngx.say(err) end

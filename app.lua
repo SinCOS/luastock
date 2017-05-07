@@ -30,11 +30,6 @@ local function get_Menu()
       title = "主力动向观测站",
       leftNav = true,
       url = {
-        ['list'] = {
-          {key = "主力资金净流入",url = "/"},
-          {key = "分时DDX(主力强度)",url = "/ddx.html"},
-          {key = "逆势主力资金流",url = "nszl.html"}
-        }
       },
       Groups = {
           ['public'] = public,
