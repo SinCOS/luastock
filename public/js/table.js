@@ -1,6 +1,4 @@
-$(function () {
-
-    var inteval = null;
+var inteval = null;
 
     function jsk(aoData) {
         var u = {}
@@ -383,5 +381,3 @@ $(function () {
 
     }
 
-
-});
