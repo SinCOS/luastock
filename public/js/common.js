@@ -1,6 +1,6 @@
-$(function () {
+
     var tabIndex = 0;
-    var element = null;
+    // /element = null;
     login = function () {
         destoryStorage();
         layer.open({
@@ -55,11 +55,9 @@ $(function () {
         }).finally(function (resp) {
             window.location = "/";
         });
-
-
     }
     layui.use(['element', 'form'], function () {
-        element = layui.element();
+        var element = layui.element();
         var form = layui.form();
         form.verify({
             username: function (value) {
@@ -320,5 +318,3 @@ $(function () {
             }
         }
     });
-
-});

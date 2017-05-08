@@ -1,9 +1,10 @@
 local route = require('router')
-local template = require "resty.template" 
+-- local template = require "resty.template" 
 local json = require('rapidjson')
 local validation = require('resty.validation')
 local cookie = require('resty.cookie'):new()
-template.caching(true)
+local config_cache = ngx.shared.stock_config
+-- template.caching(true)
 local format = string.format
 local ngx_header  = ngx.header
 local r = route.new()
@@ -69,11 +70,11 @@ local function open_mysql()
       ngx.exit(200)
   end
   local ok, err, errno, sqlstate = db:connect{
-    host ='127.0.0.1',
-    port = 3306,
-    database = 'stock',
-    user = 'root',
-    password = '123456',
+    host = config_cache:get('db:ip') or '127.0.0.1',
+    port = config_cache:get('db:port') or 3306,
+    database = config_cache:get('db:name'),
+    user = config_cache:get('db:user') ,
+    password = config_cache:get('db:pwd'),
     max_packet_size = 1024 * 1024
   }
    if not ok then
