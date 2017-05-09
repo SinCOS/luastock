@@ -10,7 +10,7 @@
     <link rel="shortcut icon" href="../favicon.ico">
 
     <link rel="stylesheet" href="/public/layui/css/layui.css" media="all">
-       <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
     <link href="https://cdn.bootcss.com/ion-rangeslider/2.1.7/css/ion.rangeSlider.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.bootcss.com/ion-rangeslider/2.1.7/css/ion.rangeSlider.skinFlat.css" />
 </head>
@@ -40,15 +40,15 @@
         {(view/menu.html)}
         <div class="layui-body tb_body" style="overflow-y:scroll;">
             <vue-echarts></vue-echarts>
-            <input type="text" class="layui-input"  id='choose_time'>
+            <input type="text" class="layui-input" id='choose_time'>
             <vue-search-echarts></vue-search-echarts>
-          <!--   <div is='vue-echarts'></div>
+            <!--   <div is='vue-echarts'></div>
             <div is='vue-search-echarts'></div> -->
             <table id="echarts_table" class="table table-striped table-bordered display" cellspacing="0 " width="100% ">
                 <thead>
 
                     <tr>
-                        <th colspan="8"  id='tab_info'></th>
+                        <th colspan="8" id='tab_info'></th>
                     </tr>
                     <tr>
                         <th style="width: 20px; ">排名</th>
@@ -69,33 +69,33 @@
 </body>
 <script type="text/x-template" id='search_echarts'>
     <div>
-            <div style="width:80%;">
-        <input type="text" id="slider-range" />
-    </div>
-    <form id="fromTableTwo" class="layui-form" style="margin-top:10px;width: 70%;margin-left: 250px;">
-        <input name="type" value="ajax_get_info" type="hidden" />
-        <div class="layui-form-item">
-            <div class="layui-inline ">
-                <div class="layui-input-inline ">
-                    <input class="layui-input" name="search_start_time" v-model="bigTime" placeholder="大时间 (HHII) " type="text ">
-                </div>
-            </div>
-            <div class="layui-inline ">
-                <div class="layui-input-inline ">
-                    <input class="layui-input" name="search_end_time" v-model="smallTime" placeholder="小时间 (HHII) " type="text ">
-                </div>
-            </div>
-        <div class="layui-form-item ">
-            <div class="layui-inline ">
-                <div class="layui-input-inline"> <a class="layui-btn " @click="search_echarts('jlr')">搜索净流入</a> </div>
-            </div>
-            <div class="layui-inline ">
-                <div class="layui-input-inline"> <a class="layui-btn layui-btn-primary" @click="search_echarts('ddx')" id="deleteTableTwo ">搜索分时DDX</a> </div>
-            </div>
+        <div style="width:80%;">
+            <input type="text" id="slider-range" />
         </div>
+        <form id="fromTableTwo" class="layui-form" style="margin-top:10px;width: 70%;margin-left: 250px;">
+            <input name="type" value="ajax_get_info" type="hidden" />
+            <div class="layui-form-item">
+                <div class="layui-inline ">
+                    <div class="layui-input-inline ">
+                        <input class="layui-input" name="search_start_time" v-model="bigTime" placeholder="大时间 (HHII) " type="text ">
+                    </div>
+                </div>
+                <div class="layui-inline ">
+                    <div class="layui-input-inline ">
+                        <input class="layui-input" name="search_end_time" v-model="smallTime" placeholder="小时间 (HHII) " type="text ">
+                    </div>
+                </div>
+                <div class="layui-form-item ">
+                    <div class="layui-inline ">
+                        <div class="layui-input-inline"> <a class="layui-btn " @click="search_echarts('jlr')">搜索净流入</a> </div>
+                    </div>
+                    <div class="layui-inline ">
+                        <div class="layui-input-inline"> <a class="layui-btn layui-btn-primary" @click="search_echarts('ddx')" id="deleteTableTwo ">搜索分时DDX</a>                            </div>
+                    </div>
+                </div>
 
-        </div>
-    </form>
+            </div>
+        </form>
     </div>
 </script>
 
@@ -109,16 +109,16 @@
 <script type="text/javascript" src="/public/js/timeline.js"></script>
 <script type="text/javascript" src="//cdn.bootcss.com/echarts/3.4.0/echarts.min.js"></script>
 <script>
-    $(function(){
-    var start = {
-    min: layui.laydate.now()
-    ,max: '2099-06-16 23:59:59'
-    ,istoday: false
-    ,choose: function(datas){
-     console.log(datas);
-    }
-  };
-        $('#choose_time').on('click',function(){
+    $(function () {
+        var start = {
+            min: layui.laydate.now(),
+            max: '2099-06-16 23:59:59',
+            istoday: false,
+            choose: function (datas) {
+                console.log(datas);
+            }
+        };
+        $('#choose_time').on('click', function () {
             alert('ddd');
             start.elem = this;
             layui.laydate(start);
@@ -131,10 +131,10 @@
     var slider = null;
     $(".layui-side").hide();
     var table_info = {
-        current:null
+        current: null
     };
 
-      function changeTwoDecimal(x) {
+    function changeTwoDecimal(x) {
         var f_x = parseFloat(x);
         if (isNaN(f_x)) {
             alert('function:changeTwoDecimal->parameter error');
@@ -144,7 +144,7 @@
 
         return f_x;
     }
-        var option = {
+    var option = {
         title: {
             text: '上证指数大盘走势图',
             x: 'center',
@@ -289,6 +289,7 @@
 
         ]
     };
+
     Vue.component('vue-search-echarts', {
         template: "#search_echarts",
         data: function () {
@@ -331,13 +332,13 @@
                         [3, "desc"]
                     ],
                     ajax: {
-                        "url": "/echarts_search?begin="+self.bigTime+'&finish='+self.smallTime+'&type='+src,
+                        "url": "/echarts_search?begin=" + self.bigTime + '&finish=' + self.smallTime +
+                            '&type=' + src,
                         "dataSrc": ""
                     },
-                    columns: [
-                        {
-                            "data":null,
-                            "orderable":false
+                    columns: [{
+                            "data": null,
+                            "orderable": false
                         },
                         {
                             "data": "cpy_id"
@@ -355,14 +356,104 @@
                             "data": 'zf'
                         },
                         {
-                            "data":null,
-                            "orderable":false
+                            "data": null,
+                            "orderable": false
                         }
                     ],
-                    "fnRowCallback":function(nRow,aData,iDisplayIndex){
-                         var page = self.table_info.page();
-                         var page_len = self.table_info.page.len();
+                    "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+
+
+
+
+                        var page = table.current.page();
+                        var page_len = table.current.page.len();
                         $('td:eq(0)', nRow).text(page * page_len + iDisplayIndex + 1);
+                        var $object = null;;
+                        $object = $('td:eq(6)', nRow);
+
+                        $object.addClass('cpy_id').attr('data', aData['cpy_id']).on('click',
+                            function () {
+                                var self = this;
+                                var cpy_id = $(this).attr('data');
+                                var cpy_name = $(this).attr("cpy_name");
+                                var _title = $(self).text();
+                                if (!app.$data.loginIn) {
+                                    login();
+                                    return false;
+                                }
+                                var layer_index = layer.open({
+                                    type: 1,
+                                    title: '自选股收藏夹',
+                                    content: $("#favor"),
+                                    area: ['345px', '435px'],
+                                    btn: ['新建', '确认'],
+                                    yes: function (index, layero) {
+                                        layer.prompt({
+                                            title: '新建收藏夹'
+                                        }, function (value, iindex,
+                                            elem) {
+                                            if (!value || value == '') {
+                                                return false;
+                                            }
+                                            Vue.http.post(
+                                                '/user/category', {
+                                                    name: value
+                                                }, {
+                                                    headers: {
+                                                        "Content-type": "application/x-www-form-urlencoded"
+                                                    }
+                                                }).then(function (
+                                                resp) {
+                                                if (resp.body.status ==
+                                                    400) {
+                                                    layer.msg(
+                                                        resp
+                                                        .body
+                                                        .message
+                                                    );
+                                                    setTimeout(
+                                                        function () {
+                                                            login
+                                                                ();
+                                                        },
+                                                        3000
+                                                    );
+
+                                                } else if (resp.body.status == 200) {
+                                                    app.reflushFavor();
+
+                                                }
+
+                                            }, function (resp) {
+                                                layer.msg(
+                                                    '网络连接失败!!!'
+                                                );
+                                            });
+
+                                            layer.close(iindex);
+                                        });
+
+                                    },
+                                    btn2: function () {
+                                        if (app.save_favor(cpy_id)) {
+                                            return true;
+                                        }
+
+                                    }
+                                });
+                                return false;
+                            }).attr('cpy_name', aData['name']).html('<a href="javascipt:void;">关注</a>').css({
+                                 "cursor": 'pointer'
+                                });;
+                        if (parseFloat(aData['zf']) > 0) {
+                            $('td:eq(5)', nRow).addClass('error');
+                            aData['zf'] = '+' + aData['zf'];
+                            $('td:eq(5)', nRow).text(aData['zf'])
+
+                        } else if (parseFloat(aData['zf']) < 0) {
+                            $('td:eq(5)', nRow).addClass('success');
+                        }
+
                         return nRow;
                     }
                 });
@@ -449,4 +540,5 @@
     }
 </style>
 {(view/footer.html)}
+
 </html>
