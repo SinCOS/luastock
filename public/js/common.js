@@ -209,7 +209,7 @@ function getTime(i) {
                     self.loginIn = true;
                     if (self.loginIn && localStorage['userFavor']) {
                         var _userFavor = JSON.parse(localStorage['userFavor']);
-                        if (_userFavor) {
+                        if (_userFavor && _userFavor.length > 0) {
                             self.userFavor = _userFavor;
                             self.favorIndex = _userFavor[0]['id'];
                         } else {
