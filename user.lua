@@ -425,7 +425,7 @@ r:match('GET','/user/vip/order',function(param)
     if not res then 
         ngx.say('666',err)
     end
-   
+   ngx.say(res.body)
 
 end)
 r:match('GET','/user/777',function(param)
