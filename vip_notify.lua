@@ -1,7 +1,7 @@
 local route = require('router')
 local json = require('rapidjson')
 local mysql = require('resty.mysql')
-local redis = require("redis_db").new()
+local redis = require("redis_db").new(2)
 local config_cache = ngx.shared.stock_config
 local format = string.format
 local ngx_header  = ngx.header
@@ -111,7 +111,8 @@ r:match('POST','/user/vip/order/notify',function(param)
             if not ok or ok.affected_rows == 0 then 
                 ngx.say('fail') 
                 return true
-            end 
+            end
+            redis:set(format('usr:%d:vip',user['id']),viptime)
             ngx.say('success')
             return true
         end
