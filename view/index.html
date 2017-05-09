@@ -38,6 +38,9 @@
     <div class="layui-layout layui-layout-admin" id='app'>
         {(view/menu.html)}
         <div class="layui-body tb_body" style="overflow-y:scroll;">
+            <div class="layui-progress layui-progress-big" lay-filter="demo" lay-showPercent="true">
+  <div class="layui-progress-bar" lay-percent="50%"></div>
+</div>
             <div class="layui-tab" lay-filter='sysctrl'>
                 <ul class="layui-tab-title">
                     <li class="layui-this">净流入</li>
@@ -172,7 +175,6 @@
 <script type="text/javascript" src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js"></script>
 <script type="text/javascript" src="/public/js/table.js?v1"></script>
 <script type="text/javascript" src="/public/js/common.js?v2.10"></script>
-
 <style type="text/css">
     td.error {
         background-color: #f04124;
@@ -186,6 +188,6 @@
         color: #fff;
     }
 </style>
-{(view/footer.html)}
 
+{(view/footer.html)}
 </html>

@@ -1,5 +1,5 @@
 var tabIndex = 0;
-// /element = null;
+var element = null;
 login = function () {
     destoryStorage();
     layer.open({
@@ -25,11 +25,18 @@ register = function () {
         ]
     });
 }
-
+buy_vip = function () {
+    layer.open({
+        type:1,
+        content:$("#vip_frm").html(),
+        area:[
+            '400px','400px'
+        ]
+    });
+}
 function destoryStorage() {
     localStorage.clear();
 }
-
 function saveUserFavor(result) {
     if (result) {
         localStorage['userFavor'] = JSON.stringify(result);
@@ -56,7 +63,7 @@ shutdown = function () {
     });
 }
 layui.use(['element', 'form'], function () {
-    var element = layui.element();
+    element = layui.element();
     var form = layui.form();
     form.verify({
         username: function (value) {
@@ -116,6 +123,56 @@ layui.use(['element', 'form'], function () {
         app.$data.tabIndex = data.index;
         console.log(JSON.stringify(data));
     });
+});
+
+function check_time(m) {
+    if (m < 10) return "0" + m;
+    return m;
+}
+
+function getTime(i) {
+    var d = new Date();
+    var h = d.getHours();
+    var m = d.getMinutes();
+    if (h == 9) {
+        if (m <= 30) {
+            return h + ":" + (30);
+        }
+    } else if (h == 11) {
+        if (m > 30) {
+            if (i > 0) {
+                return h + ":" + (30 - i);
+            }
+        }
+    } else if (h == 12) {
+        if (i > 0) {
+            return 11 + ":" + (30 - i);
+        }
+    }
+    if (h >= 15) {
+        if (i > 0) {
+            return "14:" + (60 - i);
+        }
+        return "15:00";
+    }
+    if (m == 0 && i > 0) {
+        return (h - 1) + ":" + (60 - i);
+    } else if (m == 0 && i == 0) {
+        return h + ":00";
+    }
+    if (m <= 10) {
+        if (i > 0) {
+            return h + ":" + check_time(m - i);
+        }
+
+    }
+    return h + ":" + check_time(m - i);
+}
+
+
+
+// Vue.http.options.emulateJSON = true;
+
     app = new Vue({
         el: "#app",
         data: {
@@ -134,9 +191,6 @@ layui.use(['element', 'form'], function () {
                 last_two: '',
                 last_three: ''
             }
-        },
-        updated: function () {
-            layui.element().init();
         },
         created: function () {
             var userID = getUserId();
@@ -176,15 +230,17 @@ layui.use(['element', 'form'], function () {
             this.reflushTime();
 
         },
+        updated: function(){
+          layui.element().init();
+        },
         watch: {
             loginIn: function (newV, oldV) {
-                layui.element().init();
+              
+
             }
         },
         mounted: function () {
-
-            //layui.element().init();
-
+            
         },
         methods: {
             favorManger: function () {
@@ -268,53 +324,3 @@ layui.use(['element', 'form'], function () {
             }
         }
     });
-
-});
-
-function check_time(m) {
-    if (m < 10) return "0" + m;
-    return m;
-}
-
-function getTime(i) {
-    var d = new Date();
-    var h = d.getHours();
-    var m = d.getMinutes();
-    if (h == 9) {
-        if (m <= 30) {
-            return h + ":" + (30);
-        }
-    } else if (h == 11) {
-        if (m > 30) {
-            if (i > 0) {
-                return h + ":" + (30 - i);
-            }
-        }
-    } else if (h == 12) {
-        if (i > 0) {
-            return 11 + ":" + (30 - i);
-        }
-    }
-    if (h >= 15) {
-        if (i > 0) {
-            return "14:" + (60 - i);
-        }
-        return "15:00";
-    }
-    if (m == 0 && i > 0) {
-        return (h - 1) + ":" + (60 - i);
-    } else if (m == 0 && i == 0) {
-        return h + ":00";
-    }
-    if (m <= 10) {
-        if (i > 0) {
-            return h + ":" + check_time(m - i);
-        }
-
-    }
-    return h + ":" + check_time(m - i);
-}
-
-
-
-// Vue.http.options.emulateJSON = true;

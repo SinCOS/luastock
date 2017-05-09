@@ -65,6 +65,7 @@ var inteval = null;
                         if (json.status == 404) {
                             login();
                         } else if (json.status == 403) {
+                            buy_vip()
                             layer.msg(json.message);
                         }
 
@@ -115,8 +116,6 @@ var inteval = null;
                                 title: '新建收藏夹'
                             }, function (value, iindex, elem) {
                                 if (!value || value == '') {
-
-
                                     return false;
                                 }
                                 Vue.http.post('/user/category', {
