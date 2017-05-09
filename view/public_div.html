@@ -9,7 +9,7 @@
 <div id="favor_manger" style="display:none;">
     <ul class="list-group" id='favorul' style="padding:10px;">
         <template v-for="(item,index) in userFavor">
-            <li class="list-group-item" :class="{'active':favorIndex == item.id  }"> {{item.name}} <button type="button" class="close" aria-label="Close" @click="rmGroup(item.id)"><span aria-hidden="true">&times;</span></button></li>
+            <li class="list-group-item" > {{item.name}} <button type="button" class="close" aria-label="Close" @click="rmGroup(item.id)"><span aria-hidden="true">&times;</span></button></li>
         </template>
     </ul>
 </div>

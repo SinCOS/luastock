@@ -223,7 +223,6 @@ r:match('POST','/user/register',function(args)
 end)
 r:match('POST','/user/category',function(args)
     local user_id = auth_check()
-    
     local ok,name = validation.trim(args['name'] or '') 
     local err = ''
     local err_code = 200
@@ -328,16 +327,13 @@ r:match('DELETE','/user/favor/:sg_id/:cpy_id',function(params)
     --update_stock_cache(sg_id)
 end);
 r:match('POST','/user/favor/:cpy_id',function(params)
-    local args = ngx_req.get_post_args()
-    local sg_id = tonumber(args['sg_id'] or 0)
+    local sg_id = tonumber(params['sg_id'] or 0)
     local user_id = auth_check()
     if sg_id <= 0 then
        json_error('参数错误',500)
        ngx.exit(200)
     end
    local ok , err = redis:sadd(format('usr:%d:us:%d',user_id,sg_id),params.cpy_id)
-
-
    if tonumber(ok) > 0 then
         json_suc('添加成功',200)
         ngx.eof()
@@ -347,28 +343,6 @@ r:match('POST','/user/favor/:cpy_id',function(params)
     else
         json_error("添加失败",500)
     end
-    -- local sql = format("select id from cc_user_stock where sg_id = %d and cpy_id = %s and uid = %d and status =1 limit 1;",sg_id,ndk_set.set_quote_sql_str(tostring(params.cpy_id)),user_id)
-    -- open_mysql()
-    -- res, err, errno, sqlstate = db:query(sql)
-    -- if res and #res > 0 then
-    --     json_error("已订阅",400)
-    --     return true
-    -- end
-
-    -- sql = format("insert into cc_user_stock(uid,cpy_id,created_at,sg_id) values(%d,%s,localtime(),%d);",user_id,ndk_set.set_quote_sql_str(tostring(params.cpy_id)),sg_id)
-    -- res, err, errno, sqlstate = db:query(sql)
-    -- if not res then
-    --    json_error('添加失败',400)
-    --    ngx.eof()
-    --    ngx.log(ngx.ERR,err .. ' ' ..sqlstate)
-    --    return true
-    -- end
-
-   
-    -- if res.affected_rows >  0 then
-    --   json_suc('添加成功',200)
-    --   update_stock_cache(sg_id)
-    -- end
     return true
 end);
 local function build_param(param)
@@ -393,6 +367,11 @@ r:match('GET','/user/666',function(param)
     local tb =json.decode(res)
     ngx.say(build_param(tb))
 end)
+r:match('GET','/user/vip/order/status',function(param)
+    if param['trade_status'] == 'TRADE_SUCCESS' then
+        ngx.say('交易成功')
+    end
+end)
 r:match('GET','/user/vip/order',function(param)
     local month = tonumber(param['month'] or (json_error('参数错误',404) or ngx.exit(404)))
     local sql = format('select ')
@@ -404,8 +383,8 @@ r:match('GET','/user/vip/order',function(param)
         ['total'] = price,
         ['user_id']  = user_id,
         ['body'] ="主力追踪会员服务",
-        ['notify_url'] ="http://www.zhulizhuizong.com/user/vip/order/notify",
-        ['return_url'] = "http://www.zhulizhuizong.com"
+        ['notify_url'] =stock_config:get('notify_url') or (json_error('参数错误',404) or ngx.exit(404)),
+        ['return_url'] = stock_config:get('return_url') or (json_error('参数错误',404) or ngx.exit(404))
     }
     open_mysql()
     local sql = format("insert into cc_userVip(orderID,uid,created_at,total,status,month) values('%s',%d,unix_timestamp(),%f,0,%d)",body['orderID'],user_id,body['total'],month)
@@ -420,7 +399,8 @@ r:match('GET','/user/vip/order',function(param)
           body = build_param(body),
           headers = {
                 ['Content-type'] = 'application/x-www-form-urlencoded'
-          }
+          },
+          fetch_size = 1024*1024*1024
     })
     if not res then 
         ngx.say('666',err)
