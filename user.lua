@@ -403,7 +403,7 @@ r:match('GET','/user/vip/order',function(param)
         ['title'] = '主力追踪会员服务',
         ['total'] = price,
         ['user_id']  = user_id,
-        ['body'] ="66666",
+        ['body'] ="主力追踪会员服务",
         ['notify_url'] ="http://www.zhulizhuizong.com/user/vip/order/notify",
         ['return_url'] = "http://www.zhulizhuizong.com"
     }
@@ -425,7 +425,7 @@ r:match('GET','/user/vip/order',function(param)
     if not res then 
         ngx.say('666',err)
     end
-   ngx.say(res.body)
+   
 
 end)
 r:match('GET','/user/777',function(param)
