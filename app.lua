@@ -97,6 +97,7 @@ local _current_time = ngx.time()
 end)
 r:match('GET','/echarts_search',function(params)
   local args = ngx_req.get_uri_args()
+  local stock_cache = ngx.shared.stock_cache
   local begin = args['begin'] or '09:15'
   local finish = args['finish'] or '13:00'
   local _type =  args['type'] == 'jlr' and 'jlr' or 'zlbfb'
