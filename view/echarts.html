@@ -446,14 +446,16 @@
                             }).attr('cpy_name', aData['name']).html('<a href="javascipt:void;">关注</a>').css({
                                  "cursor": 'pointer'
                                 });;
-                        if (parseFloat(aData['zf']) > 0) {
-                            $('td:eq(5)', nRow).addClass('error');
-                            aData['zf'] = '+' + aData['zf'];
-                            $('td:eq(5)', nRow).text(aData['zf'])
 
-                        } else if (parseFloat(aData['zf']) < 0) {
-                            $('td:eq(5)', nRow).addClass('success');
-                        }
+                        bgColor(aData['zf'],5,nRow);
+                        bgColor(aData['zs'],4,nRow);
+                        // if (parseFloat(aData['zf']) > 0) {
+                        //     $('td:eq(5)', nRow).addClass('error');
+                        //     $('td:eq(5)', nRow).text('+' + aData['zf'])
+
+                        // } else if (parseFloat(aData['zf']) < 0) {
+                        //     $('td:eq(5)', nRow).addClass('success');
+                        // }
 
                         return nRow;
                     }

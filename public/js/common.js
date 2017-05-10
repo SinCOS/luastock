@@ -10,6 +10,13 @@ login = function () {
         ]
     });
 }
+bgColor = function(val,col,nRow){
+    if(parseFloat(val) >0 ){
+        $("td:eq("+col +")",nRow).text("+"+ val).addClass('error');
+    }else if(parseFloat(val) < 0){
+         $("td:eq("+col +")",nRow).addClass('success');
+    }
+}
 getUserId = function () {
     if (localStorage.userID !== null) {
         return localStorage['userID'];
