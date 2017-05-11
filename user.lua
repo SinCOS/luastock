@@ -383,8 +383,8 @@ r:match('GET','/user/vip/order',function(param)
         ['total'] = price,
         ['user_id']  = user_id,
         ['body'] ="主力追踪会员服务",
-        ['notify_url'] =stock_config:get('notify_url') or (json_error('参数错误',404) or ngx.exit(404)),
-        ['return_url'] = stock_config:get('return_url') or (json_error('参数错误',404) or ngx.exit(404))
+        ['notify_url'] =config_cache:get('notify_url') or (json_error('参数错误',404) or ngx.exit(404)),
+        ['return_url'] = config_cache:get('return_url') or (json_error('参数错误',404) or ngx.exit(404))
     }
     open_mysql()
     local sql = format("insert into cc_userVip(orderID,uid,created_at,total,status,month) values('%s',%d,unix_timestamp(),%f,0,%d)",body['orderID'],user_id,body['total'],month)
