@@ -43,26 +43,11 @@ r:match('GET','/',function()
    view:render(menu)
    return true
 end);
-r:match('GET','/zlzj.html',function()
-   local menu = get_Menu()
-   local view = template.new('view/zlzj.html')
-   view:render(menu)
-   return true
-end)
+
 r:match('GET','/echarts',function()
   local menu = get_Menu()
   menu.leftNav = false
   local view = template.new('view/echarts.html')
-  view:render(menu);
-end)
-r:match('GET','/ddx.html',function()
-  local menu = get_Menu()
-  local view = template.new('view/ddx.html')
-  view:render(menu);
-end)
-r:match("GET", '/nszl.html',function()
- local menu = get_Menu()
-  local view = template.new('view/nszl.html')
   view:render(menu);
 end)
 r:match('GET','cache',function()
@@ -142,7 +127,7 @@ r:match('GET','/echarts_search',function(params)
     if vv ~= k['cpy_id']  then
       local _v = k 
       _v['one'] = '0.00'
-      _v['name'] = cpy_name[_v['cpy_id']]
+      _v['name'] = cpy_name[_v['cpy_id']] or ''
       tb_insert(_t,_v)
       _count = _count + 1
    else
