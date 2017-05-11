@@ -39,8 +39,8 @@
         {(view/menu.html)}
         <div class="layui-body tb_body" style="overflow-y:scroll;">
             <div class="layui-progress layui-progress-big" lay-filter="demo" lay-showPercent="true">
-  <div class="layui-progress-bar" lay-percent="50%"></div>
-</div>
+                <div class="layui-progress-bar" lay-percent="50%"></div>
+            </div>
             <div class="layui-tab" lay-filter='sysctrl'>
                 <ul class="layui-tab-title">
                     <li class="layui-this">净流入</li>
@@ -82,10 +82,10 @@
             </tr>
             <tr>
                 <th colspan="2">15：00-9：30</th>
-                <th v-text="time.last_one"></th>
-                <th v-text="time.last_two"></th>
                 <th v-text="time.last_three"></th>
-                <th v-text="time.last_one + '-' + time.last_three"></th>
+                <th v-text="time.last_two"></th>
+                <th v-text="time.last_one"></th>
+                <th v-text="time.last_three + '-' + time.last_one"></th>
                 <th> </th>
                 <th></th>
                 <th></th>
@@ -117,10 +117,10 @@
                 </tr>
                 <tr>
                     <th colspan='2'>15：00-9：30</th>
-                    <th v-text="time.last_one"></th>
-                    <th v-text="time.last_two"></th>
                     <th v-text="time.last_three"></th>
-                    <th v-text="time.last_one + '-' + time.last_three"></th>
+                    <th v-text="time.last_two"></th>
+                    <th v-text="time.last_one"></th>
+                    <th v-text="time.last_three + '-' + time.last_one"></th>
                     <th> </th>
                     <th></th>
                     <th></th>
@@ -141,10 +141,6 @@
                 </tr>
             </thead>
             <thead v-else>
-
-                <tr>
-                    <th colspan="12">逆市主力资金流</th>
-                </tr>
                 <tr>
                     <th colspan="12">说明:委托20万以上，成交的金额算做主力流入流出资金</th>
                 </tr>
@@ -182,12 +178,13 @@
         color: #fff;
     }
 
-    td.success {
-        background-color: #56A73D;
-        border-color: #3a945b;
+    .ssuccess {
+        background-color: #5FB878;
+        border-color: #5FB878;
         color: #fff;
     }
 </style>
 
 {(view/footer.html)}
+
 </html>

@@ -13,8 +13,8 @@ login = function () {
 bgColor = function(val,col,nRow){
     if(parseFloat(val) >0 ){
         $("td:eq("+col +")",nRow).text("+"+ val).addClass('error');
-    }else if(parseFloat(val) < 0){
-         $("td:eq("+col +")",nRow).addClass('success');
+    }else if(parseFloat(val) <= 0){
+         $("td:eq("+col +")",nRow).addClass('ssuccess');
     }
 }
 getUserId = function () {
