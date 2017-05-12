@@ -110,7 +110,7 @@ r:match('GET','/echarts_search',function(params)
   local db_path = format('/data/wwwroot/sysctrl/db/%02d%02d.db',_current_table['month'],_current_table['day'])
   local db = require("lsqlite3").open(db_path)
   if not db then 
-     ngx.say('{}','db failed')
+     ngx.say('{}','db failed',db_path)
     return true
   end
   local _temp = stock_cache:get('cpy_name')
