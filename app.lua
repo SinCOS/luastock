@@ -89,13 +89,14 @@ r:match('GET','/echarts_search',function(params)
   redis:select(0)
   local _ok , _err = redis:get('stock_count')
   local stock_count = tonumber(_ok or 0) *2 
-  if byte(begin,1,1) == 48 then
-      begin = sub(begin,2)
-  end
-  if byte(finish,1,1) == 48 then
-      finish = sub(finish,2)
-  end 
+  -- if byte(begin,1,1) == 48 then
+  --     begin = sub(begin,2)
+  -- end
+  -- if byte(finish,1,1) == 48 then
+  --     finish = sub(finish,2)
+  -- end 
   local sql = format("select cpy_id,%s,zf,zs from cc_stock_info where addtime in ('%s','%s') and cpy_id <> '' order by cpy_id,addtime   limit %d ;",_type,begin,finish,stock_count);
+  
   local md5_key = ngx.md5('sql:'..sql)
   redis:select(0)
   local ok, err = redis:get(md5_key)
