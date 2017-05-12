@@ -99,6 +99,7 @@ r:match('GET','/echarts_search',function(params)
   local md5_key = ngx.md5('sql:'..sql)
   redis:select(0)
   local ok, err = redis:get(md5_key)
+  ngx.say(sql)
   if ok then 
     ngx.say(ok)
     return true
