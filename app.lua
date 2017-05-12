@@ -100,7 +100,7 @@ r:match('GET','/echarts_search',function(params)
   redis:select(0)
   local ok, err = redis:get(md5_key)
   if ok then 
-    ngx.say('{}')
+    ngx.say(ok)
     return true
   end 
   local _current_time = ngx.time()
