@@ -192,6 +192,7 @@ function getTime(i) {
             favorselectIndex: 0,
             echarts: null,
             reflush_url: '',
+            reflushTable:false,
             time: {
                 current_time: '',
                 last_one: '',

@@ -188,7 +188,7 @@ function build_datables(table) {
 }
 Vue.component('datatables', {
     template: "#datables",
-    props: ['parent_url', 'data', 'tabindex'],
+    props: ['parent_url', 'data', 'tabindex','reflushtbl'],
     data: function () {
         if (this.data == 'jlr') {
             return {
@@ -331,22 +331,43 @@ Vue.component('datatables', {
     },
     methods: {
         handle: function () {
-            console.log(this.table.current);
             if (typeof this.table.current === undefined || this.table.current == null) {
-                console.log('初始化');
                 this.table.current = $('#' + this.id).DataTable(build_datables(this.table));
                 return true;
             }
-            return false;
+             if (this.tabindex == 0 && this.data == 'jlr') {
+                 this.table.current.ajax.reload();
+            } else if (this.tabindex == 1 && this.data == 'ddx') {
+                 this.table.current.ajax.reload();
+            } else if (this.tabindex == 2 && this.data == 'nszl') {
+                 this.table.current.ajax.reload();
+            }
+        },
+         reflushTime: function () {
+                this.time.last_one = getTime(1);
+                this.time.last_two = getTime(2);
+                this.time.last_three = getTime(3);
         }
+        
     },
     watch: {
         parent_url: function () {
             this.table.stock_url = this.stock_url + this.parent_url;
-            if (this.table.current == null) {
-                return this.handle();
+          
+                this.handle();
+        
+           
+           
+        },
+        reflushtbl:function(){
+             if (this.tabindex == 0 && this.data == 'jlr') {
+                this.handle()
+            } else if (this.tabindex == 1 && this.data == 'ddx') {
+                this.handle();
+            } else if (this.tabindex == 2 && this.data == 'nszl') {
+                this.handle();
             }
-            this.table.current.ajax.reload();
+            this.reflushTime();
         },
         tabindex: function () {
             if (this.tabindex == 0 && this.data == 'jlr') {
@@ -368,9 +389,7 @@ Vue.component('datatables', {
 
 
 try {
-
-    if (typeof table_info !== undefined && table_info.current) {
-        console.log('ok');
+        var mincount = 0;
         inteval = setInterval(function () {
             var d = new Date();
             var h = d.getHours();
@@ -390,10 +409,16 @@ try {
                 clearInterval(inteval);
                 return;
             }
-            app.reflushTime();
-            table_info.current.ajax.reload();
-        }, 30 * 1000);
-    }
+            mincount ++ ;
+            layui.element().progress('demo', ((mincount /60 ) *100).toFixed(0) +'%');
+            if(mincount >= 60){
+                mincount = 0;
+                app.$data.reflushTable = ! app.$data.reflushTable ;
+              
+            }
+            
+        }, 1000);
+    
 } catch (e) {
 
 }
