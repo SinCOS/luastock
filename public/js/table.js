@@ -397,10 +397,6 @@ try {
             if (h < 9) {
                 clearInterval(inteval);
             }
-            if (!(h == 11 && m <= 30)) {
-                clearInterval(inteval);
-                return;
-            }
             if (h == 12) {
                 clearInterval(inteval);
                 return;
