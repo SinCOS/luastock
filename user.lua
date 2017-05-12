@@ -353,7 +353,7 @@ local function build_param(param)
     return table.concat( _t, "&")
 end
 local function month_price (month)
-    if month == 1 then return 200 end
+    if month == 1 then return 20 end
     if month == 3 then return 55 end
     if month == 6 then return 110 end
     if month == 12 then return 200 end
