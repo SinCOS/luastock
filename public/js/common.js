@@ -238,7 +238,6 @@ function getTime(i) {
 
         },
         updated: function(){
-          layui.element().init();
         },
         watch: {
             loginIn: function (newV, oldV) {
