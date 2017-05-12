@@ -137,7 +137,7 @@ r:match('GET','/echarts_search',function(params)
       local last  = _count -1
      _t[last]['one'] = format("%.2f",tonumber(k[_type]) - tonumber(_t[last][_type]))
      _t[last]['zs'] = format('%.2f',tonumber(k['zs'] or 0.00) - tonumber(_t[last]['zs'] or 0.00) )
-     _t[last]['zf'] = format('%.2f',tonumber(k['zf']) - tonumber(_t[last]['zf']))
+     _t[last]['zf'] = format('%.2f',tonumber(k['zf'] or 0.00) - tonumber(_t[last]['zf'] or 0.00))
    end
    vv =  k['cpy_id']
   end
