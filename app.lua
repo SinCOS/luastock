@@ -27,7 +27,7 @@ local function get_Menu()
   end
 
   return {
-      title = "主力动向观测站",
+      title = "主力资金动向观测站",
       leftNav = true,
       url = {
       },
