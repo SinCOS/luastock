@@ -8,7 +8,7 @@ local byte = string.byte
 local sub = string.sub
 local tb_insert = table.insert
 local ngx_req= ngx.req
-template.caching(false)
+template.caching(true)
 ngx.header.content_type = 'text/html; charset=utf-8'
 ngx_req.read_body()
 local r = route.new()
